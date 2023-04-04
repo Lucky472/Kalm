@@ -5,7 +5,7 @@ Created on Tue Apr  4 10:33:41 2023
 
 @author: kchateau
 """
-import MyFirstClient as MFC
+import ClientH as MFC
 import serveur_partie as sp
 from tkinter import*
 from tkinter.colorchooser import askcolor
@@ -87,30 +87,11 @@ class Menu :
         self.enregistrer_host()
         
         if self.nickname != NICKNAME :
-            if self.oponent_clicked_play() and self.has_defied:
-                self.open_server()
-                self.s_server.SendConnectOponent()
-                
             self.client_window = MFC.ClientWindow(self.host, self.port, self.color, self.nickname)
             self.client_window.myMainLoop()
             
         else :
-            boxedmessage.showinfo(title=None, message="please change your nickname")
-    
-    def open_server(self):
-        self.local_server = None
-    
-    def defy_player(self,player):
-        self._server.SendTo("action":"defy","who":player["nickname"])
-        
-    
-    def oponent_cliked_play(self):
-        pass
-    
-    def actualise_leaderboard(self):
-        pass
-    
-    
+            boxedmessage.showinfo(title=None, message="please change your nickname") 
     
     def change_color(self):
         colors=askcolor(title="Tkinter Color Chooser")

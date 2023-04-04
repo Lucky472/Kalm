@@ -7,7 +7,7 @@ Created on Mon Apr  3 22:43:23 2023
 
 #Kalm
 
-import MyFirstClient as MFC
+import ClientH as MFC
 from tkinter import*
 from tkinter.colorchooser import askcolor
 from tkinter import messagebox as boxedmessage
