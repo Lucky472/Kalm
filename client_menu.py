@@ -111,11 +111,23 @@ class Menu :
         
     def enregistrer_liste_joueur(self,dico_list):
         self.Liste_joueur=[]
+        c=0
+        d=0
         for i in range(0,len(self.dico_list)):
             a=self.dico_list[i]["name"]
             b=self.dico_list[i]["score"]
-            self.Liste_joueur.append(a)
-            self.Liste_joueur.append(b)
+            if b>c:
+                self.Liste_joueur.append(a)
+                self.Liste_joueur.append(b)
+            elif b<=0:
+                self.Liste_joueur.insert(0,a)
+                self.Liste_joueur.insert(1,b)
+            else:
+                self.Liste_joueur.insert(d,a)
+                self.Liste_joueur.insert(d+1,b)
+            d=c
+            c=b
+        print (self.Liste_joueur)  
  
    
     def afficher_liste_joueur(self,dico_list):
@@ -124,7 +136,7 @@ class Menu :
             self.L_joueur.pack(pady=i) 
     
         
-        
+      
         
         
         
