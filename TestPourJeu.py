@@ -3,12 +3,14 @@ Y_AXIS_LENGTH = 7
 X_AXIS_LENGTH = 7
 BOARD_X_LENGTH = 2 * X_AXIS_LENGTH - 1
 BOARD_Y_LENGTH = 2 * Y_AXIS_LENGTH - 1
-SIZESQUARE = 10
+SIZESQUARE = 20
 COLORSQUARE = "#A567A3"
+WIDTHWALL = 10
 
 class View:
     def __init__(self,window,board):
         self.window = window
+        self.board = board
         self.canvas_board = Canvas(self.window)
         self.draw_board(board)
         self.canvas_board.pack()
@@ -16,9 +18,12 @@ class View:
     def draw_board(self,board):
         for x in range(BOARD_X_LENGTH):
             for y in range (BOARD_Y_LENGTH):
-                if self.is_square(x,y):
-                    self.canvas_board.create_rectangle(x*SIZESQUARE,y*SIZESQUARE,(x+1)*SIZESQUARE,(y+1)*SIZESQUARE,fill = COLORSQUARE)
+                self.board[x][y] = self.canvas_board.create_rectangle(x*SIZESQUARE,y*SIZESQUARE,(x+1)*SIZESQUARE,(y+1)*SIZESQUARE,fill = COLORSQUARE)
 
+                if self.is_square(x,y):
+                    self.board[x][y] = self.canvas_board.create_rectangle(x*SIZESQUARE,y*SIZESQUARE,(x+1)*SIZESQUARE,(y+1)*SIZESQUARE,fill = COLORSQUARE)
+                else:
+                    self.board[x][y] = self.canvas_board.create_rectangle(x*SIZESQUARE,y*SIZESQUARE,(x+1)*SIZESQUARE,(y+1)*SIZESQUARE,fill = "#0A8637")
     def is_square(self,x,y):
         return (x % 2 == 0) and (y % 2 == 0)
 
