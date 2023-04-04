@@ -53,12 +53,7 @@ class Client(ConnectionListener):
     def Network_start(self,data):
         self.state=ACTIVE
         print("started")
-   
-    def Network_newPoint(self, data):
-        (x,y)=data["newPoint"]
-        self.window.white_board_canvas.create_oval(x-R,y-R,x+R,y+R)
-        self.window.white_board_canvas.update()
-    
+
     def Network_error(self, data):
         print('error:', data['error'][1])
         connection.Close()
