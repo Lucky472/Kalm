@@ -13,14 +13,8 @@ class ClientChannel(Channel):
     def Close(self):
         self._server.DelPlayer(self)
     
-    def Network_newPoint(self, data):
-        print(data)
-        self._server.SendToOthers({"newPoint": data["newPoint"], "who": self.nickname})
-    
-    def Network_nickname(self, data):
-        self.nickname = data["nickname"]
-        self._server.PrintPlayers()
-        self.Send({"action":"start"})
+    def Network_temporary(self,data):
+        pass
 
 class MyServer(Server):
     channelClass = ClientChannel
@@ -35,7 +29,8 @@ class MyServer(Server):
     def AddPlayer(self, player):
         print("New Player connected")
         self.players[player] = True
- 
+        self.listplayers.append()
+    
     def PrintPlayers(self):
         print("players' nicknames :",[p.nickname for p in self.players])
   
@@ -44,12 +39,29 @@ class MyServer(Server):
         del self.players[player]
        
     def SendToOthers(self, data):
-        [p.Send({"action":"newPoint", "newPoint" : data["newPoint"]}) for p in self.players if p.nickname != data["who"]]
+        [p.Send(data) for p in self.players if p.nickname != data["who"]]
     
+    def SendToAll(self, data):
+        [p.Send(data) for p in self.players]
+    
+    def SendTo(self, data):
+        [p.Send(data) for p in self.players if p.nickname == data["who"]]
+
     def Launch(self):
         while True:
             self.Pump()
             sleep(0.001)
+
+"""
+class Player :
+    def __init__(self,idi,nickname,color,score,state):
+        self.idi = idi
+        self.nickname = nickname
+        self.color = color
+        self.score = score
+        self.state = state
+"""   
+
 
 # get command line argument of server, port
 if len(sys.argv) != 2:
