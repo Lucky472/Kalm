@@ -58,3 +58,24 @@ class MyServer(Server):
         while True:
             self.Pump()
             sleep(0.001)
+
+class Model :
+    def __init__(self):
+        pass
+    
+    def new_board(self):
+        pass
+    
+    def move_pawn(self,pawn,location):
+        pass
+    
+    def add_wall(self,location,orientation):
+        pass
+    
+    def test_add_wall(self,location,orientation):
+        test = True
+        return test
+    
+    def test_move_pawn(self,pawn,location):
+        test = True
+        return test
