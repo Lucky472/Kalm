@@ -32,7 +32,9 @@ class Buttons :
         self.f_pseudo= Frame(self.frame,bg='#41B77F')
         self.f_host = Frame(self.frame,bg='#41B77F')
         self.f_port = Frame(self.frame,bg='#41B77F')
+        self.f_adversaire=Frame(self.window)
         self.f_liste=Frame(self.window)
+        
         
     def text(self):
         self.Labeltitle1=Label(self.frame,text='Menu du jeu saucisse',font=("arial",30),bg='#41B77F',fg='white')
@@ -40,6 +42,7 @@ class Buttons :
         self.L_pseudo=Label(self.frame,text='choisi ton pseudo',font=("arial",19),bg='#41B77F',fg='white')
         self.L_host=Label(self.frame,text='host',font=("arial",19),bg='#41B77F',fg='white')
         self.L_port = Label(self.frame,text='port',font=("arial",19),bg='#41B77F',fg='white')
+        self.L_adversaire=Label(self.f_adversaire,text='choisi ton adversaire',font=("arial",19),bg='#41B77F',fg='white')
         self.trier_liste_score(self.dico_list) 
         self.classe_liste(self.dico_list,self.Liste_score_joueur)
         self.afficher_liste_joueur(self.dico_list)
@@ -53,6 +56,7 @@ class Buttons :
         self.e_pseudo=Entry(self.f_pseudo,font=("arial",20),bg='#41B77F',fg='white')
         self.e_host = Entry(self.f_host,font=("arial",20),bg='#41B77F',fg='white')
         self.e_port = Entry(self.f_port,font=("arial",20),bg='#41B77F',fg='white')
+        self.e_adversaire = Entry(self.f_adversaire,font=("arial",20),bg='#41B77F',fg='white')
         self.e_pseudo.insert(0,NICKNAME)
         self.e_host.insert(0,HOST)
         self.e_port.insert(0,PORT)
@@ -72,6 +76,9 @@ class Buttons :
         self.L_port.pack()
         self.e_port.pack()
         self.f_port.pack()
+        self.L_adversaire.pack()
+        self.e_adversaire.pack()
+        self.f_adversaire.pack()
         self.B_jouer.pack(side=BOTTOM)
         self.f_liste.pack(side=RIGHT)
 
