@@ -13,15 +13,16 @@ X_AXIS_LENGTH = 7
 BOARD_X_LENGTH = 2 * X_AXIS_LENGTH - 1
 BOARD_Y_LENGTH = 2 * Y_AXIS_LENGTH - 1
 SIZESQUARE = 50
+RADIUSPAWN = 17
 COLORBOARD = "#454545"
 WIDTHWALL = 10
-WIDTHLINE = 3
+WIDTHLINE = 4
 COLORLINE = "#D4D4D4"
 LENGTH_LINE = 10
 PIXEL_BOARD_X_LENGTH = X_AXIS_LENGTH * SIZESQUARE
 PIXEL_BOARD_Y_LENGTH = Y_AXIS_LENGTH * SIZESQUARE
-X_OFFSET = 6
-Y_OFFSET = 6
+X_OFFSET = 10
+Y_OFFSET = 10
 
 HOST, PORT = "localhost", "31425"
 NICKNAME = "nick"
@@ -121,7 +122,9 @@ class View:
         self.canvas_board = Canvas(self.window,height = PIXEL_BOARD_Y_LENGTH + 2*Y_OFFSET,width =  PIXEL_BOARD_X_LENGTH + 2*X_OFFSET,bg =COLORBOARD )
         self.draw_board()
         self.canvas_.pack()
-    
+        # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6)
+        self.pawns = {"DOWN":self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1 ),"UP":self.draw_pawn(X_AXIS_LENGTH // 2, 0)}
+        print(self.pawns)
     def draw_board(self):
         #Lignes verticales
         for x in range(X_AXIS_LENGTH+1):
@@ -138,6 +141,21 @@ class View:
                 x1 = (x+1)*SIZESQUARE - LENGTH_LINE + X_OFFSET +1
                 self.canvas_board.create_line(x0,y01,x1,y01,fill = COLORLINE,width=WIDTHLINE)
 
+    def draw_pawn(self,x,y):
+        x0,y0 = self.get_center(x,y)
+        idd =  self.canvas_board.create_oval(x0 - RADIUSPAWN,y0-RADIUSPAWN,x0 + RADIUSPAWN,y0 + RADIUSPAWN,fill = COLORLINE)
+        return idd
+    def get_center(self,x,y):
+        x0 = x*SIZESQUARE + X_OFFSET + SIZESQUARE//2
+        y0 = y*SIZESQUARE + Y_OFFSET + SIZESQUARE//2
+        return (x0,y0)
+
+    def delete_pawn(self,pawn_id):
+        self.canvas_board.delete(self.pawns.pop(pawn_id))
+        
+    def move_pawn(self,x,y,pawn_id):
+        self.delete_pawn(pawn_id)
+        self.pawns[pawn_id] = self.draw_pawn(x,y)
 class Model :
     def __init__(self):
         self.board = self.new_board()
