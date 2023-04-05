@@ -42,9 +42,9 @@ class Buttons :
         self.L_host=Label(self.frame,text='host',font=("arial",19),bg='#41B77F',fg='white')
         self.L_port = Label(self.frame,text='port',font=("arial",19),bg='#41B77F',fg='white')
         self.L_adversaire=Label(self.f_adversaire,text='choisi ton adversaire',font=("arial",19),bg='#41B77F',fg='white')
-        self.trier_liste_score(self.dico_list) 
-        self.classe_liste(self.dico_list,self.Liste_score_joueur)
-        self.afficher_liste_joueur(self.dico_list)
+        self.menu.trier_liste_score(self.dico_list) 
+        self.menu.classe_liste(self.dico_list,self.Liste_score_joueur)
+        self.menu.afficher_liste_joueur(self.dico_list)
 
     def buttons(self):
         self.B_quitter=Button(self.menu.Window,text='quitter',command=self.menu.Window.destroy,bg='#ed1111')
