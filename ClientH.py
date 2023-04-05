@@ -12,10 +12,16 @@ Y_AXIS_LENGTH = 7
 X_AXIS_LENGTH = 7
 BOARD_X_LENGTH = 2 * X_AXIS_LENGTH - 1
 BOARD_Y_LENGTH = 2 * Y_AXIS_LENGTH - 1
-SIZESQUARE = 10
-COLORSQUARE = "#A567A3"
+SIZESQUARE = 50
+COLORBOARD = "#454545"
+WIDTHWALL = 10
+WIDTHLINE = 3
+COLORLINE = "#D4D4D4"
+LENGTH_LINE = 10
 PIXEL_BOARD_X_LENGTH = X_AXIS_LENGTH * SIZESQUARE
 PIXEL_BOARD_Y_LENGTH = Y_AXIS_LENGTH * SIZESQUARE
+X_OFFSET = 6
+Y_OFFSET = 6
 
 HOST, PORT = "localhost", "31425"
 NICKNAME = "nick"
@@ -83,20 +89,27 @@ class ClientWindow(Tk):
 
 
 class View:
-    def __init__(self,window,board):
+    def __init__(self,window):
         self.window = window
-        self.canvas_board = Canvas(self.window)
-        self.draw_board(board)
+        self.canvas_board = Canvas(self.window,height = PIXEL_BOARD_Y_LENGTH + 2*Y_OFFSET,width =  PIXEL_BOARD_X_LENGTH + 2*X_OFFSET,bg =COLORBOARD )
+        self.draw_board()
+        self.canvas_board.pack()
     
-    def draw_board(self,board):
-        for x in range(BOARD_X_LENGTH):
-            for y in range (BOARD_Y_LENGTH):
-                if self.is_square(x,y):
-                    self.canvas_board.create_rectangle(x*SIZESQUARE,y*SIZESQUARE,(x+1)*SIZESQUARE,(y+1)*SIZESQUARE)
-
-    def is_square(self,x,y):
-        return (x % 2 == 0) and (y % 2 == 0)
-
+    def draw_board(self):
+        #Lignes verticales
+        for x in range(X_AXIS_LENGTH+1):
+            x01 = SIZESQUARE*x + X_OFFSET +1
+            for y in range (Y_AXIS_LENGTH):
+                y0 = y*SIZESQUARE + LENGTH_LINE + Y_OFFSET +1
+                y1 = (y+1)*SIZESQUARE - LENGTH_LINE + Y_OFFSET +1
+                self.canvas_board.create_line(x01,y0,x01,y1,fill = COLORLINE,width=WIDTHLINE)
+        #Lignes horizontales
+        for y in range(Y_AXIS_LENGTH+1):
+            y01 = SIZESQUARE*y + Y_OFFSET +1
+            for x in range (X_AXIS_LENGTH):
+                x0 = x*SIZESQUARE + LENGTH_LINE + X_OFFSET +1
+                x1 = (x+1)*SIZESQUARE - LENGTH_LINE + X_OFFSET +1
+                self.canvas_board.create_line(x0,y01,x1,y01,fill = COLORLINE,width=WIDTHLINE)
 
 class Model :
     def __init__(self):
