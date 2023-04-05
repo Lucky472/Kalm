@@ -31,7 +31,7 @@ class Buttons :
         self.f_pseudo= Frame(self.frame,bg='#41B77F')
         self.f_host = Frame(self.frame,bg='#41B77F')
         self.f_port = Frame(self.frame,bg='#41B77F')
-        self.f_liste=Frame(self.window)
+        self.f_liste=Frame(self.menu.Window)
         self.f_liste.pack(side=RIGHT)
         
     def text(self):
@@ -40,8 +40,8 @@ class Buttons :
         self.L_pseudo=Label(self.frame,text='choisi ton pseudo',font=("arial",19),bg='#41B77F',fg='white')
         self.L_host=Label(self.frame,text='host',font=("arial",19),bg='#41B77F',fg='white')
         self.L_port = Label(self.frame,text='port',font=("arial",19),bg='#41B77F',fg='white')
-        self.enregistrer_liste_joueur(self.dico_list) 
-        self.afficher_liste_joueur(self.dico_list)
+        self.menu.enregistrer_liste_joueur(self.menu.dico_list) 
+        self.menu.afficher_liste_joueur(self.menu.dico_list)
 
     def buttons(self):
         self.B_quitter=Button(self.menu.Window,text='quitter',command=self.menu.Window.destroy,bg='#ed1111')

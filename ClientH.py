@@ -94,10 +94,11 @@ class Controller:
         self.view = View(window)
         self.view.canvas_board.bind("<Button-1>",self.board_click)
         self.move = MOVE_PAWN
-        self.is_active = INITIAL
+        self.state = INITIAL
     
     def board_click(self):
-        pass
+        if self.state == ACTIVE :
+            pass
     
     def set_wall_vertical(self):
         self.move = PLACE_WALL_UP
