@@ -20,6 +20,7 @@ BASECOLOR = "#ca7511"
 class Buttons :
     def __init__(self, menu):
         self.menu = menu
+        self.dico_list=[{"name":"matteo","score":0},{"name":"killian","score":6},{"name":"adrien","score":2},{"name":"lucas","score":4}]
         self.frame()
         self.text()
         self.buttons()
@@ -32,7 +33,6 @@ class Buttons :
         self.f_host = Frame(self.frame,bg='#41B77F')
         self.f_port = Frame(self.frame,bg='#41B77F')
         self.f_liste=Frame(self.window)
-        self.f_liste.pack(side=RIGHT)
         
     def text(self):
         self.Labeltitle1=Label(self.frame,text='Menu du jeu saucisse',font=("arial",30),bg='#41B77F',fg='white')
@@ -40,7 +40,8 @@ class Buttons :
         self.L_pseudo=Label(self.frame,text='choisi ton pseudo',font=("arial",19),bg='#41B77F',fg='white')
         self.L_host=Label(self.frame,text='host',font=("arial",19),bg='#41B77F',fg='white')
         self.L_port = Label(self.frame,text='port',font=("arial",19),bg='#41B77F',fg='white')
-        self.enregistrer_liste_joueur(self.dico_list) 
+        self.trier_liste_score(self.dico_list) 
+        self.classe_liste(self.dico_list,self.Liste_score_joueur)
         self.afficher_liste_joueur(self.dico_list)
 
     def buttons(self):
@@ -72,6 +73,7 @@ class Buttons :
         self.e_port.pack()
         self.f_port.pack()
         self.B_jouer.pack(side=BOTTOM)
+        self.f_liste.pack(side=RIGHT)
 
 
 class Menu :
@@ -108,32 +110,31 @@ class Menu :
         
     def enregistrer_port(self):
         self.port=self.buttons.e_port.get()
-        
-    def enregistrer_liste_joueur(self,dico_list):
-        self.Liste_joueur=[]
-        c=0
-        d=0
-        for i in range(0,len(self.dico_list)):
-            a=self.dico_list[i]["name"]
-            b=self.dico_list[i]["score"]
-            if b>c:
-                self.Liste_joueur.append(a)
-                self.Liste_joueur.append(b)
-            elif b<=0:
-                self.Liste_joueur.insert(0,a)
-                self.Liste_joueur.insert(1,b)
-            else:
-                self.Liste_joueur.insert(d,a)
-                self.Liste_joueur.insert(d+1,b)
-            d=c
-            c=b
-        print (self.Liste_joueur)  
+    
  
-   
     def afficher_liste_joueur(self,dico_list):
         for i in range(len(self.Liste_joueur)-2,-1,-2):
             self.L_joueur=Label(self.f_liste,text=self.Liste_joueur[i]+" "+ str(self.Liste_joueur[i+1]),font=("arial",8),fg='red')
             self.L_joueur.pack(pady=i) 
+            
+    def trier_liste_score(self,dico_list):
+        self.Liste_score_joueur=[]
+        for i in range(0,len(self.dico_list)):
+            a=self.dico_list[i]["score"]
+            self.Liste_score_joueur.append(a)
+        self.Liste_score_joueur.sort()
+        print (self.Liste_score_joueur)
+     
+    def classe_liste(self,dico_list,Liste_score_joueur):
+        self.Liste_joueur=[]
+        for i in Liste_score_joueur:
+            for j in range(0,len(self.dico_list)):
+                if i==self.dico_list[j]["score"] and self.dico_list[j]["name"] not in self.Liste_joueur:
+                    a=self.dico_list[j]["name"]
+                    self.Liste_joueur.append(a)
+                    b=self.dico_list[j]["score"]
+                    self.Liste_joueur.append(b)
+        print(self.Liste_joueur)
     
         
       
