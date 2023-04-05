@@ -31,6 +31,11 @@ INITIAL=0
 ACTIVE=1
 DEAD=-1
 
+MOVE_PAWN = 0
+PLACE_WALL_UP = 1
+PLACE_WALL_ACROSS = 2
+
+
 class Client(ConnectionListener):
     def __init__(self, host, port, window,color,nickname):
         self.window = window
@@ -75,10 +80,12 @@ class Client(ConnectionListener):
 #########################################################
 
 class ClientWindow(Tk):
+    #c'est lui notre controller
     def __init__(self, host, port,color,nickname):
         Tk.__init__(self)
         self.client = Client(host, int(port), self,color,nickname)
-
+        self.controller = Controller(self)
+        
 
     def myMainLoop(self):
         while self.client.state!=DEAD:   
@@ -87,13 +94,33 @@ class ClientWindow(Tk):
             sleep(0.001)
         exit()    
 
-
+class Controller:
+    def __init__(self,window):
+        self.model = Model()
+        self.view = View(window)
+        self.view.canvas_board.bind("<Button-1>",self.board_click)
+        self.move = MOVE_PAWN
+        self.state = INITIAL
+    
+    def board_click(self):
+        if self.state == ACTIVE :
+            pass
+    
+    def set_wall_vertical(self):
+        self.move = PLACE_WALL_UP
+                
+    def set_wall_horisontal(self):
+        self.move = PLACE_WALL_ACROSS
+    
+    def set_move_pawn(self):
+        self.move = MOVE_PAWN
+        
 class View:
     def __init__(self,window):
         self.window = window
         self.canvas_board = Canvas(self.window,height = PIXEL_BOARD_Y_LENGTH + 2*Y_OFFSET,width =  PIXEL_BOARD_X_LENGTH + 2*X_OFFSET,bg =COLORBOARD )
         self.draw_board()
-        self.canvas_board.pack()
+        self.canvas_.pack()
     
     def draw_board(self):
         #Lignes verticales
@@ -114,7 +141,7 @@ class View:
 class Model :
     def __init__(self):
         self.board = self.new_board()
-        self.pawns = {"UP":Pawn((0, BOARD_X_LENGTH // 2)), "DOWN":Pawn((BOARD_Y_LENGTH, BOARD_X_LENGTH // 2))}
+        self.pawns = {"UP":Pawn((BOARD_X_LENGTH // 2, 0)), "DOWN":Pawn((BOARD_X_LENGTH // 2, BOARD_Y_LENGTH))}
     
     def new_board(self):
         board = [[0 for j in range(BOARD_Y_LENGTH)] for i in range(BOARD_X_LENGTH)]
