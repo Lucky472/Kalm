@@ -115,7 +115,12 @@ class Model :
         return (x % 2 == 0) and (y % 2 == 0)
     
     def move_pawn(self,pawn,location):
-        pass
+        pawn_x,pawn_y=self.pawns[pawn].coords
+        self.board[pawn_x][pawn_y].occupied = False
+        pawn_x,pawn_y=location
+        self.pawns[pawn].coords = (pawn_x,pawn_y)
+        self.board[pawn_x][pawn_y].occupied = True
+        
     
     def add_wall(self,location,orientation):
         """
