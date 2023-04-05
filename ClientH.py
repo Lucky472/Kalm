@@ -128,7 +128,7 @@ class View:
 class Model :
     def __init__(self):
         self.board = self.new_board()
-        self.pawns = {"UP":Pawn((0, BOARD_X_LENGTH // 2)), "DOWN":Pawn((BOARD_Y_LENGTH, BOARD_X_LENGTH // 2))}
+        self.pawns = {"UP":Pawn((BOARD_X_LENGTH // 2, 0)), "DOWN":Pawn((BOARD_X_LENGTH // 2, BOARD_Y_LENGTH))}
     
     def new_board(self):
         board = [[0 for j in range(BOARD_Y_LENGTH)] for i in range(BOARD_X_LENGTH)]
