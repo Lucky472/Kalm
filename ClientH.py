@@ -156,6 +156,7 @@ class View:
     def move_pawn(self,x,y,pawn_id):
         self.delete_pawn(pawn_id)
         self.pawns[pawn_id] = self.draw_pawn(x,y)
+        
 class Model :
     def __init__(self):
         self.board = self.new_board()

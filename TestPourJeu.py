@@ -6,14 +6,16 @@ BOARD_Y_LENGTH = 2 * Y_AXIS_LENGTH - 1
 SIZESQUARE = 50
 RADIUSPAWN = 17
 COLORBOARD = "#454545"
-WIDTHWALL = 10
+WIDTHWALL = 20
 WIDTHLINE = 4
 COLORLINE = "#D4D4D4"
+COLORWALL = "#AA5372"
 LENGTH_LINE = 10
 PIXEL_BOARD_X_LENGTH = X_AXIS_LENGTH * SIZESQUARE
 PIXEL_BOARD_Y_LENGTH = Y_AXIS_LENGTH * SIZESQUARE
 X_OFFSET = 10
 Y_OFFSET = 10
+SPACING = 4
 class View:
     def __init__(self,window):
         self.window = window
@@ -22,7 +24,6 @@ class View:
         self.canvas_board.pack()
         # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6)
         self.pawns = {"DOWN":self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1 ),"UP":self.draw_pawn(X_AXIS_LENGTH // 2, 0)}
-        print(self.pawns)
         
     def draw_board(self):
         #Lignes verticales
@@ -55,6 +56,45 @@ class View:
     def move_pawn(self,x,y,pawn_id):
         self.delete_pawn(pawn_id)
         self.pawns[pawn_id] = self.draw_pawn(x,y)
+
+    def place_wall(self,x,y,orientation,color):
+        if type == "horizontal":
+            self.place_horizontal_wall(x,y,color)
+        elif type == "vertical":
+            self.place_vertical_wall(x,y,color)
+    
+    def place_vertical_wall(self,x,y):
+        x0 = x*SIZESQUARE +X_OFFSET + WIDTHLINE
+        y0 = y*SIZESQUARE +Y_OFFSET +SPACING
+        """x1 = x*SIZESQUARE +X_OFFSET - WIDTHLINE
+        y1 = (y+1)*SIZESQUARE +Y_OFFSET -SPACING
+        self.canvas_board.create_rectangle(x0,y0,x1,y1,fill = COLORWALL)
+        #place la barre du haut
+        x0 = x*SIZESQUARE +X_OFFSET + WIDTHLINE
+        y0 = (y+1)*SIZESQUARE +Y_OFFSET +SPACING
+        """
+        x1 = x*SIZESQUARE +X_OFFSET - WIDTHLINE
+        y1 = (y+2)*SIZESQUARE +Y_OFFSET -SPACING
+        self.canvas_board.create_rectangle(x0,y0,x1,y1,fill = COLORWALL)
+
+
+    def place_horizontal_wall(self,x,y):
+        y0 = y*SIZESQUARE +Y_OFFSET + WIDTHLINE
+        x0 = x*SIZESQUARE +X_OFFSET +SPACING
+        """y1 = y*SIZESQUARE +Y_OFFSET - WIDTHLINE
+        x1 = (x+1)*SIZESQUARE +X_OFFSET -SPACING
+        self.canvas_board.create_rectangle(x0,y0,x1,y1,fill = COLORWALL)
+        
+        #place la barre de gauche
+        y0 = y*SIZESQUARE +Y_OFFSET + WIDTHLINE
+        x0 = (x+1)*SIZESQUARE +X_OFFSET +SPACING
+        """
+        y1 = y*SIZESQUARE +Y_OFFSET - WIDTHLINE
+        x1 = (x+2)*SIZESQUARE +X_OFFSET -SPACING
+        self.canvas_board.create_rectangle(x0,y0,x1,y1,fill = COLORWALL)
+        
+        
+
 
 class Model :
     def __init__(self):
@@ -195,5 +235,11 @@ class Square :
 
 window = Tk()
 view = View(window)
+"""
+tests
+view.place_horizontal_wall(3,2)
+view.place_horizontal_wall(1,2)
+view.place_vertical_wall(5,1)
+"""
 window.mainloop()
 
