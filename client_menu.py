@@ -96,6 +96,7 @@ class Menu :
         self.enregistrer_pseudo()
         self.enregistrer_port()
         self.enregistrer_host()
+        self.enregistrer_adversaire()
         if self.nickname != NICKNAME :
             self.client_window = MFC.ClientWindow(self.host, self.port, self.color, self.nickname)
             self.client_window.myMainLoop()
@@ -116,8 +117,10 @@ class Menu :
         
     def enregistrer_port(self):
         self.port=self.buttons.e_port.get()
+        
+    def enregistrer_adversaire(self):
+        self.adversaire=self.buttons.e_adversaire.get()
     
- 
     def afficher_liste_joueur(self,dico_list):
         for i in range(len(self.Liste_joueur)-2,-1,-2):
             self.L_joueur=Label(self.f_liste,text=self.Liste_joueur[i]+" "+ str(self.Liste_joueur[i+1]),font=("arial",8),bg='#4065A4',fg='black')
