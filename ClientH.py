@@ -79,6 +79,7 @@ class ClientWindow(Tk):
             sleep(0.001)
         exit()    
 
+
 class View:
     def __init__(self,window,board):
         self.window = window
@@ -93,6 +94,8 @@ class View:
 
     def is_square(self,x,y):
         return (x % 2 == 0) and (y % 2 == 0)
+
+
 class Model :
     def __init__(self):
         self.board = self.new_board()
@@ -211,6 +214,7 @@ class Model :
         if border == []:
             return False
         return self.pathfind_test(location,targeted_y,all_accessibles=all_accessibles,new_accessibles=border)
+
 
 class Pawn :
     def __init__(self,coords):

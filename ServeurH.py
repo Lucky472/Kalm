@@ -13,8 +13,14 @@ class ClientChannel(Channel):
     def Close(self):
         self._server.DelPlayer(self)
     
-    def Network_temporary(self,data):
-        pass
+    def Network_send_to(self,data):
+        self.SendTo(data)
+        
+    def Network_send_to_all(self,data):
+        self.SendToAll(data)
+        
+    def Network_send_to_others(self,data):
+        self.SendToOthers(data)
 
 class MyServer(Server):
     channelClass = ClientChannel
