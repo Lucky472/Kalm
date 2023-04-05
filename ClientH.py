@@ -216,7 +216,7 @@ class Model :
                             return True
                         border.append(square)
                         all_accessibles.append(square)
-        if border == []:
+        if len(border) == 0:
             return False
         return self.pathfind_test(location,targeted_y,all_accessibles=all_accessibles,new_accessibles=border)
 
