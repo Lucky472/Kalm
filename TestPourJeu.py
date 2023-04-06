@@ -5,6 +5,8 @@ BOARD_X_LENGTH = 2 * X_AXIS_LENGTH - 1
 BOARD_Y_LENGTH = 2 * Y_AXIS_LENGTH - 1
 SIZESQUARE = 50
 RADIUSPAWN = 17
+RADIUSDOTS = 5
+COLORDOT = "#EEEEEE"
 COLORBOARD = "#454545"
 WIDTHWALL = 20
 WIDTHLINE = 4
@@ -17,13 +19,17 @@ X_OFFSET = 10
 Y_OFFSET = 10
 SPACING = 4
 class View:
-    def __init__(self,window):
+    def __init__(self,window,color,oponent_color):
         self.window = window
         self.canvas_board = Canvas(self.window,height = PIXEL_BOARD_Y_LENGTH + 2*Y_OFFSET,width =  PIXEL_BOARD_X_LENGTH + 2*X_OFFSET,bg =COLORBOARD )
         self.draw_board()
         self.canvas_board.pack()
+        self.color = color 
+        self.oponent_color = oponent_color
         # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6)
-        self.pawns = {"DOWN":self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1 ),"UP":self.draw_pawn(X_AXIS_LENGTH // 2, 0)}
+        self.pawns = {"DOWN":self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1,self.color),"UP":self.draw_pawn(X_AXIS_LENGTH // 2, 0,self.oponent_color)}
+        #Pour gérer la couleur faudra savoir la couleur du bas et celle du haut
+
         
     def draw_board(self):
         #Lignes verticales
@@ -41,10 +47,11 @@ class View:
                 x1 = (x+1)*SIZESQUARE - LENGTH_LINE + X_OFFSET 
                 self.canvas_board.create_line(x0,y01,x1,y01,fill = COLORLINE,width=WIDTHLINE)
         
-    def draw_pawn(self,x,y):
+    def draw_pawn(self,x,y,color):
         x0,y0 = self.get_center(x,y)
-        idd =  self.canvas_board.create_oval(x0 - RADIUSPAWN,y0-RADIUSPAWN,x0 + RADIUSPAWN,y0 + RADIUSPAWN,fill = COLORLINE)
+        idd =  self.canvas_board.create_oval(x0 - RADIUSPAWN,y0-RADIUSPAWN,x0 + RADIUSPAWN,y0 + RADIUSPAWN,fill = color)
         return idd
+    
     def get_center(self,x,y):
         x0 = x*SIZESQUARE + X_OFFSET + SIZESQUARE//2
         y0 = y*SIZESQUARE + Y_OFFSET + SIZESQUARE//2
@@ -78,6 +85,13 @@ class View:
         x1 = (x+2)*SIZESQUARE +X_OFFSET -SPACING
         self.canvas_board.create_rectangle(x0,y0,x1,y1,fill = COLORWALL)
 
+    def show_plays(self,playable_list):
+        """
+            affiche les points atteignables depuis une position, prend une liste de tuple en argument
+        """
+        for square in playable_list:
+            x0,y0 = self.get_center(square[0],square[1])
+            id_ =  self.canvas_board.create_oval(x0 - RADIUSDOTS,y0-RADIUSDOTS,x0 + RADIUSDOTS,y0 + RADIUSDOTS,fill = COLORDOT)
 
 class Model :
     def __init__(self):
@@ -217,12 +231,13 @@ class Square :
 
 
 window = Tk()
-view = View(window)
+view = View(window,"#0000FF","#FF00FF")
 """
 tests
 view.place_horizontal_wall(3,2)
 view.place_horizontal_wall(1,2)
 view.place_vertical_wall(5,1)
+"""
 """
 for x in range(1,X_AXIS_LENGTH):
      x_minus = x*SIZESQUARE + X_OFFSET - LENGTH_LINE
@@ -234,6 +249,8 @@ for x in range(1,X_AXIS_LENGTH):
                 view.canvas_board.create_rectangle(x_minus,y0,x_maxus,y1,fill = "#000000")
             else :
                 view.canvas_board.create_rectangle(x_minus,y0,x_maxus,y1,fill = "#682925")
+"""
 
+view.show_plays([(1,1),(2,2),(3,3)])
 window.mainloop()
 
