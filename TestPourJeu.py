@@ -91,7 +91,7 @@ class View:
         """
         for square in playable_list:
             x0,y0 = self.get_center(square[0],square[1])
-            id_ =  self.canvas_board.create_oval(x0 - RADIUSDOTS,y0-RADIUSDOTS,x0 + RADIUSDOTS,y0 + RADIUSDOTS,fill = COLORDOT,id="deletable_dots")
+            self.canvas_board.create_oval(x0 - RADIUSDOTS,y0-RADIUSDOTS,x0 + RADIUSDOTS,y0 + RADIUSDOTS,fill = COLORDOT,tags="deletable_dots")
 
 class Model :
     def __init__(self):

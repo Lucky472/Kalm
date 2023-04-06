@@ -137,6 +137,7 @@ class Controller:
                     self.send_moved_pawn(square)
 
     def controller_move_pawn(self,pawn, location):
+        self.view.canvas_board.delete("deletable_dots")
         x,y = location
         self.view.move_pawn(x, y, pawn)
         self.model.move_pawn(pawn, location)
