@@ -142,9 +142,6 @@ class Controller:
         self.model.add_wall((x,y),orientation)
         self.state = INACTIVE
     
-    
-    
-    
     def detect_clicked_hole(self,pixel_x,pixel_y):
         for x in range(1,X_AXIS_LENGTH):
             x_minus = x*SIZESQUARE + X_OFFSET - LENGTH_LINE
@@ -169,6 +166,7 @@ class Controller:
     
     def set_move_pawn(self):
         self.move = MOVE_PAWN
+        self.view.show_plays()
         
 class View:
     def __init__(self,window,color,oponent_color):
@@ -217,7 +215,15 @@ class View:
                 self.place_horizontal_wall(x,y)
             elif type == PLACE_WALL_UP:
                 self.place_vertical_wall(x,y)
-    
+
+    def show_plays(self,playable_list):
+        """
+            affiche les points atteignables depuis une position, prend une liste de tuple en argument
+        """
+        for square in playable_list:
+            x0,y0 = self.get_center(square[0],square[1])
+            id_ =  self.canvas_board.create_oval(x0 - RADIUSDOTS,y0-RADIUSDOTS,x0 + RADIUSDOTS,y0 + RADIUSDOTS,fill = COLORDOT)
+
     def place_vertical_wall(self,x,y):
         x0 = x*SIZESQUARE +X_OFFSET + WIDTHLINE
         y0 = y*SIZESQUARE +Y_OFFSET +SPACING
