@@ -92,8 +92,6 @@ class View:
         y1 = y*SIZESQUARE +Y_OFFSET - WIDTHLINE
         x1 = (x+2)*SIZESQUARE +X_OFFSET -SPACING
         self.canvas_board.create_rectangle(x0,y0,x1,y1,fill = COLORWALL)
-        
-        
 
 
 class Model :
@@ -241,5 +239,15 @@ view.place_horizontal_wall(3,2)
 view.place_horizontal_wall(1,2)
 view.place_vertical_wall(5,1)
 """
+for x in range(1,X_AXIS_LENGTH):
+     x_minus = x*SIZESQUARE + X_OFFSET - LENGTH_LINE
+     x_maxus = (x)*SIZESQUARE + X_OFFSET + LENGTH_LINE
+     for y in range(1,Y_AXIS_LENGTH):
+            y0 = y*SIZESQUARE + Y_OFFSET - LENGTH_LINE
+            y1 = (y)*SIZESQUARE + Y_OFFSET + LENGTH_LINE
+            if x%2 == 0:
+                view.canvas_board.create_rectangle(x_minus,y0,x_maxus,y1,fill = "#000000")
+            else :
+                view.canvas_board.create_rectangle(x_minus,y0,x_maxus,y1,fill = "#682925")
 window.mainloop()
 

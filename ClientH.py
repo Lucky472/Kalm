@@ -103,9 +103,21 @@ class Controller:
         self.move = MOVE_PAWN
         self.state = INITIAL
     
-    def board_click(self):
-        if self.state == ACTIVE :
+    def board_click(self,evt):
+        if (self.state == ACTIVE) and (self.detect_clicked_hole(evt.x,evt.y)):
             pass
+    
+    def detect_clicked_hole(self,pixel_x,pixel_y):
+        for x in range(1,X_AXIS_LENGTH):
+            x_minus = x*SIZESQUARE + X_OFFSET - LENGTH_LINE
+            x_maxus = (x)*SIZESQUARE + X_OFFSET + LENGTH_LINE
+            for y in range(1,Y_AXIS_LENGTH):
+                y_minus = y*SIZESQUARE + Y_OFFSET - LENGTH_LINE
+                y_maxus = (y)*SIZESQUARE + Y_OFFSET + LENGTH_LINE
+                if (pixel_x >= x_minus) and (pixel_x <= x_maxus):
+                    if (pixel_y >= y_minus) and (pixel_x <= y_maxus):
+                        return (x,y)
+        return None
     
     def set_wall_vertical(self):
         self.move = PLACE_WALL_UP
