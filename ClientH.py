@@ -80,6 +80,9 @@ class Client(ConnectionListener):
         print('Server disconnected')
         exit()
     
+    def Network_placed_wall(self,data):
+        self.window.controller.controller_place_wall(data["location"], data["orientation"])
+        self.window.controller.set_active()
 #########################################################
 
 class ClientWindow(Tk):
@@ -107,22 +110,33 @@ class Controller:
         self.move = MOVE_PAWN
         self.state = INITIAL
     
+    def set_active(self):
+        self.state = ACTIVE
+    
     def board_click(self,evt):
         if (self.state == ACTIVE):
             if (self.move == PLACE_WALL_UP): 
                 hole = self.detect_clicked_hole(evt.x,evt.y)
                 if (hole != None):
                     if self.model.test_add_wall((hole[0],hole[1]),"UP"):
-                        self.view.place_wall(hole[0],hole[1],self.move)  
-                        self.model.add_wall((hole[0],hole[1]),"UP")
+                        self.controller_place_wall((hole[0],hole[1]),"UP")
                         self.send_placed_wall((hole[0],hole[1]),"UP")
             if (self.move == PLACE_WALL_ACROSS): 
                 hole = self.detect_clicked_hole(evt.x,evt.y)
                 if (hole != None):
                     if self.model.test_add_wall((hole[0],hole[1]),"ACROSS"):
-                        self.view.place_wall(hole[0],hole[1],self.move)  
-                        self.model.add_wall((hole[0],hole[1]),"ACROSS")
+                        self.controller_place_wall((hole[0],hole[1]),"ACROSS")
                         self.send_placed_wall((hole[0],hole[1]),"ACROSS")
+    
+    def controller_place_wall(self,location,orientation):
+        x,y = location
+        self.view.place_wall(x,y,self.move)  
+        self.model.add_wall((x,y),orientation)
+        self.state = INACTIVE
+    
+    
+    
+    
     def detect_clicked_hole(self,pixel_x,pixel_y):
         for x in range(1,X_AXIS_LENGTH):
             x_minus = x*SIZESQUARE + X_OFFSET - LENGTH_LINE
