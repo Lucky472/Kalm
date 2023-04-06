@@ -32,6 +32,7 @@ BASECOLOR = "#ca7511"
 
 INITIAL=0
 ACTIVE=1
+INACTIVE=2
 DEAD=-1
 
 MOVE_PAWN = 0
@@ -86,12 +87,10 @@ class Client(ConnectionListener):
 #########################################################
 
 class ClientWindow(Tk):
-    #c'est lui notre controller
     def __init__(self, host, port,color,nickname):
         Tk.__init__(self)
         self.client = Client(host, int(port), self,color,nickname)
         self.controller = Controller(self,self.client)
-        
 
     def myMainLoop(self):
         while self.client.state!=DEAD:   
