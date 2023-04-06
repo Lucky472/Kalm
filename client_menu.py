@@ -151,4 +151,4 @@ class Menu :
         
         
 
-menmenu = Menu()
+menu = Menu()
