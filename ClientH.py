@@ -14,6 +14,8 @@ BOARD_X_LENGTH = 2 * X_AXIS_LENGTH - 1
 BOARD_Y_LENGTH = 2 * Y_AXIS_LENGTH - 1
 SIZESQUARE = 50
 RADIUSPAWN = 17
+RADIUSDOTS = 5
+COLORDOT = "#EEEEEE"
 COLORBOARD = "#454545"
 WIDTHWALL = 10
 WIDTHLINE = 4
@@ -34,6 +36,7 @@ INITIAL=0
 ACTIVE=1
 INACTIVE=2
 DEAD=-1
+INACTIVE = 2
 
 MOVE_PAWN = 0
 PLACE_WALL_UP = 1
@@ -162,14 +165,15 @@ class Controller:
         self.move = MOVE_PAWN
         
 class View:
-    def __init__(self,window):
+    def __init__(self,window,color,oponent_color):
         self.window = window
         self.canvas_board = Canvas(self.window,height = PIXEL_BOARD_Y_LENGTH + 2*Y_OFFSET,width =  PIXEL_BOARD_X_LENGTH + 2*X_OFFSET,bg =COLORBOARD )
         self.draw_board()
         self.canvas_.pack()
         # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6) pour une taille de 7 cases
         self.pawns = {"DOWN":self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1 ),"UP":self.draw_pawn(X_AXIS_LENGTH // 2, 0)}
-        print(self.pawns)
+        self.color = color 
+        self.oponent_color = oponent_color
     def draw_board(self):
         #Lignes verticales
         for x in range(X_AXIS_LENGTH+1):
