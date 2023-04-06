@@ -42,9 +42,9 @@ class Buttons :
         self.L_host=Label(self.frame,text='host',font=("arial",19),bg='#41B77F',fg='white')
         self.L_port = Label(self.frame,text='port',font=("arial",19),bg='#41B77F',fg='white')
         self.L_adversaire=Label(self.f_adversaire,text='choisi ton adversaire',font=("arial",19),bg='#41B77F',fg='white')
-        self.trier_liste_score(self.dico_list) 
-        self.classe_liste(self.dico_list,self.Liste_score_joueur)
-        self.afficher_liste_joueur(self.dico_list)
+        self.menu.trier_liste_score(self.dico_list) 
+        self.menu.classe_liste(self.dico_list,self.Liste_score_joueur)
+        self.menu.afficher_liste_joueur(self.dico_list)
 
     def buttons(self):
         self.B_quitter=Button(self.menu.Window,text='quitter',command=self.menu.Window.destroy,bg='#ed1111')
@@ -96,6 +96,7 @@ class Menu :
         self.enregistrer_pseudo()
         self.enregistrer_port()
         self.enregistrer_host()
+        self.enregistrer_adversaire()
         if self.nickname != NICKNAME :
             self.client_window = MFC.ClientWindow(self.host, self.port, self.color, self.nickname)
             self.client_window.myMainLoop()
@@ -116,17 +117,19 @@ class Menu :
         
     def enregistrer_port(self):
         self.port=self.buttons.e_port.get()
+        
+    def enregistrer_adversaire(self):
+        self.adversaire=self.buttons.e_adversaire.get()
     
- 
     def afficher_liste_joueur(self,dico_list):
         for i in range(len(self.Liste_joueur)-2,-1,-2):
-            self.L_joueur=Label(self.f_liste,text=self.Liste_joueur[i]+" "+ str(self.Liste_joueur[i+1]),font=("arial",8),fg='red')
+            self.L_joueur=Label(self.buttons.f_liste,text=self.Liste_joueur[i]+" "+ str(self.Liste_joueur[i+1]),font=("arial",8),bg='#4065A4',fg='black'bd=2,relief=SUNKEN,)
             self.L_joueur.pack(pady=i) 
             
     def trier_liste_score(self,dico_list):
         self.Liste_score_joueur=[]
-        for i in range(0,len(self.dico_list)):
-            a=self.dico_list[i]["score"]
+        for i in range(0,len(self.buttons.dico_list)):
+            a=self.buttons.dico_list[i]["score"]
             self.Liste_score_joueur.append(a)
         self.Liste_score_joueur.sort()
         print (self.Liste_score_joueur)
@@ -135,10 +138,10 @@ class Menu :
         self.Liste_joueur=[]
         for i in Liste_score_joueur:
             for j in range(0,len(self.dico_list)):
-                if i==self.dico_list[j]["score"] and self.dico_list[j]["name"] not in self.Liste_joueur:
-                    a=self.dico_list[j]["name"]
+                if i==self.buttons.dico_list[j]["score"] and self.buttons.dico_list[j]["name"] not in self.Liste_joueur:
+                    a=self.buttons.dico_list[j]["name"]
                     self.Liste_joueur.append(a)
-                    b=self.dico_list[j]["score"]
+                    b=self.buttons.dico_list[j]["score"]
                     self.Liste_joueur.append(b)
         print(self.Liste_joueur)
     
