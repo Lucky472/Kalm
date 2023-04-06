@@ -161,12 +161,13 @@ class Controller:
     def set_wall_vertical(self):
         self.move = PLACE_WALL_UP
                 
-    def set_wall_horisontal(self):
+    def set_wall_horizontal(self):
         self.move = PLACE_WALL_ACROSS
     
     def set_move_pawn(self):
         self.move = MOVE_PAWN
-        self.view.show_plays()
+        x,y = self.model.pawns[self.my_pawn].coords
+        self.view.show_plays(x,y)
         
 class View:
     def __init__(self,window,color,oponent_color):
