@@ -133,7 +133,7 @@ class Controller:
             if self.move == MOVE_PAWN :
                 square = self.detect_clicked_square(evt.x,evt.y)
                 if square != None and square in self.model.accessible_from(self.model.pawns[self.my_pawn]):
-                    
+                    pass
                     
     
     def controller_place_wall(self,location,orientation):
