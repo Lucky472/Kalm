@@ -13,8 +13,11 @@ class ClientChannel(Channel):
     def Close(self):
         self._server.DelPlayer(self)
     
-    def Network_send_to(self,data):
-        self.SendTo(data)
+    def Network_send_to_opponent(self,data):
+        data["who"] = self.opponent
+        data["action"] = data["sent_action"]
+        new_data = {key:data[key] for key in data if key != "sent_action"}
+        self.SendTo(new_data)
         
     def Network_send_to_all(self,data):
         self.SendToAll(data)

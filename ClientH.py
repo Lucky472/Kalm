@@ -87,7 +87,7 @@ class ClientWindow(Tk):
     def __init__(self, host, port,color,nickname):
         Tk.__init__(self)
         self.client = Client(host, int(port), self,color,nickname)
-        self.controller = Controller(self)
+        self.controller = Controller(self,self.client)
         
 
     def myMainLoop(self):
@@ -98,7 +98,9 @@ class ClientWindow(Tk):
         exit()    
 
 class Controller:
-    def __init__(self,window):
+    def __init__(self,window,client):
+        self.window = window
+        self.client = client
         self.model = Model()
         self.view = View(window)
         self.view.canvas_board.bind("<Button-1>",self.board_click)
@@ -113,15 +115,14 @@ class Controller:
                     if self.model.test_add_wall((hole[0],hole[1]),"UP"):
                         self.view.place_wall(hole[0],hole[1],self.move)  
                         self.model.add_wall((hole[0],hole[1]),"UP")
-
+                        self.send_placed_wall((hole[0],hole[1]),"UP")
             if (self.move == PLACE_WALL_ACROSS): 
                 hole = self.detect_clicked_hole(evt.x,evt.y)
                 if (hole != None):
                     if self.model.test_add_wall((hole[0],hole[1]),"ACROSS"):
                         self.view.place_wall(hole[0],hole[1],self.move)  
                         self.model.add_wall((hole[0],hole[1]),"ACROSS")
-
-
+                        self.send_placed_wall((hole[0],hole[1]),"ACROSS")
     def detect_clicked_hole(self,pixel_x,pixel_y):
         for x in range(1,X_AXIS_LENGTH):
             x_minus = x*SIZESQUARE + X_OFFSET - LENGTH_LINE
@@ -133,6 +134,10 @@ class Controller:
                     if (pixel_y >= y_minus) and (pixel_x <= y_maxus):
                         return (x,y)
         return None
+    
+    
+    def send_placed_wall(self,location,orientation):
+        self.client.Send({"action":"send_to_opponent", "sent_action":"placed_wall", "location":location, "orientation":orientation})
     
     def set_wall_vertical(self):
         self.move = PLACE_WALL_UP
@@ -149,7 +154,7 @@ class View:
         self.canvas_board = Canvas(self.window,height = PIXEL_BOARD_Y_LENGTH + 2*Y_OFFSET,width =  PIXEL_BOARD_X_LENGTH + 2*X_OFFSET,bg =COLORBOARD )
         self.draw_board()
         self.canvas_.pack()
-        # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6)
+        # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6) pour une taille de 7 cases
         self.pawns = {"DOWN":self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1 ),"UP":self.draw_pawn(X_AXIS_LENGTH // 2, 0)}
         print(self.pawns)
     def draw_board(self):
