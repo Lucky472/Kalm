@@ -123,7 +123,7 @@ class Menu :
     
     def afficher_liste_joueur(self,dico_list):
         for i in range(len(self.Liste_joueur)-2,-1,-2):
-            self.L_joueur=Label(self.buttons.f_liste,text=self.Liste_joueur[i]+" "+ str(self.Liste_joueur[i+1]),font=("arial",8),bg='#4065A4',fg='black'bd=2,relief=SUNKEN,)
+            self.L_joueur=Label(self.buttons.f_liste,text=self.Liste_joueur[i]+" "+ str(self.Liste_joueur[i+1]),font=("arial",8),bg='#4065A4',fg='black',bd=2,relief=SUNKEN)
             self.L_joueur.pack(pady=i) 
             
     def trier_liste_score(self,dico_list):
@@ -151,4 +151,4 @@ class Menu :
         
         
 
-menu = Menu()
+menmenu = Menu()
