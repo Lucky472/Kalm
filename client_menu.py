@@ -123,13 +123,13 @@ class Menu :
     
     def afficher_liste_joueur(self,dico_list):
         for i in range(len(self.Liste_joueur)-2,-1,-2):
-            self.L_joueur=Label(self.f_liste,text=self.Liste_joueur[i]+" "+ str(self.Liste_joueur[i+1]),font=("arial",8),bg='#4065A4',fg='black')
+            self.L_joueur=Label(self.buttons.f_liste,text=self.Liste_joueur[i]+" "+ str(self.Liste_joueur[i+1]),font=("arial",8),bg='#4065A4',fg='black'bd=2,relief=SUNKEN,)
             self.L_joueur.pack(pady=i) 
             
     def trier_liste_score(self,dico_list):
         self.Liste_score_joueur=[]
-        for i in range(0,len(self.dico_list)):
-            a=self.dico_list[i]["score"]
+        for i in range(0,len(self.buttons.dico_list)):
+            a=self.buttons.dico_list[i]["score"]
             self.Liste_score_joueur.append(a)
         self.Liste_score_joueur.sort()
         print (self.Liste_score_joueur)
@@ -138,10 +138,10 @@ class Menu :
         self.Liste_joueur=[]
         for i in Liste_score_joueur:
             for j in range(0,len(self.dico_list)):
-                if i==self.dico_list[j]["score"] and self.dico_list[j]["name"] not in self.Liste_joueur:
-                    a=self.dico_list[j]["name"]
+                if i==self.buttons.dico_list[j]["score"] and self.buttons.dico_list[j]["name"] not in self.Liste_joueur:
+                    a=self.buttons.dico_list[j]["name"]
                     self.Liste_joueur.append(a)
-                    b=self.dico_list[j]["score"]
+                    b=self.buttons.dico_list[j]["score"]
                     self.Liste_joueur.append(b)
         print(self.Liste_joueur)
     
