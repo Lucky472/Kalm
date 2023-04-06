@@ -92,7 +92,7 @@ class ClientWindow(Tk):
     def __init__(self, host, port,color,nickname):
         Tk.__init__(self)
         self.client = Client(host, int(port), self,color,nickname)
-        self.controller = Controller(self,self.client)
+        self.controller = Controller(self,self.client,"UP","DOWN")
 
     def myMainLoop(self):
         while self.client.state!=DEAD:   
@@ -133,9 +133,14 @@ class Controller:
             if self.move == MOVE_PAWN :
                 square = self.detect_clicked_square(evt.x,evt.y)
                 if square != None and square in self.model.accessible_from(self.model.pawns[self.my_pawn]):
-                    pass
-                    
-    
+                    self.controller_move_pawn(self.my_pawn, square)
+                    self.send_moved_pawn(square)
+
+    def controller_move_pawn(self,pawn, location):
+        x,y = location
+        self.view.move_pawn(x, y, pawn)
+        self.model.move_pawn(pawn, location)
+        
     def controller_place_wall(self,location,orientation):
         x,y = location
         self.view.place_wall(x,y,self.move)  
@@ -158,6 +163,9 @@ class Controller:
     def send_placed_wall(self,location,orientation):
         self.client.Send({"action":"send_to_opponent", "sent_action":"placed_wall", "location":location, "orientation":orientation})
     
+    def send_moved_pawn(self,location):
+        self.client.Send({"action":"send_to_opponent", "sent_action":"moved_pawn", "location":location})
+
     def set_wall_vertical(self):
         self.move = PLACE_WALL_UP
                 
