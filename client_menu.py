@@ -20,7 +20,7 @@ BASECOLOR = "#ca7511"
 class Buttons :
     def __init__(self, menu):
         self.menu = menu
-        self.dico_list=[{"name":"matteo","score":0},{"name":"killian","score":6},{"name":"adrien","score":2},{"name":"lucas","score":4}]
+        self.dico_list=[{"name":"Matteo","score":0},{"name":"Killian","score":6},{"name":"Adrien","score":2},{"name":"Lucas","score":4}]
         self.frame()
         self.text()
         self.buttons()
@@ -124,7 +124,7 @@ class Menu :
     
     def afficher_liste_joueur(self,dico_list):
         for i in range(len(self.Liste_joueur)-2,-1,-2):
-            self.L_joueur=Label(self.buttons.f_liste,text=self.Liste_joueur[i]+" "+ str(self.Liste_joueur[i+1]),font=("arial",8),bg='#4065A4',fg='black',bd=2,relief=SUNKEN)
+            self.L_joueur=Label(self.buttons.f_liste,text=self.Liste_joueur[i]+" "+ str(self.Liste_joueur[i+1]),font=("arial",10),bg='#4065A4',fg='black',bd=2,relief=SUNKEN)
             self.L_joueur.pack(pady=i) 
             
     def trier_liste_score(self,dico_list):

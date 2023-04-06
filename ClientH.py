@@ -86,6 +86,10 @@ class Client(ConnectionListener):
     def Network_placed_wall(self,data):
         self.window.controller.controller_place_wall(data["location"], data["orientation"])
         self.window.controller.set_active()
+        
+    def Network_moved_pawn(self,data):
+        self.window.controller.controller_move_pawn(self.window.controller.opponent_pawn, data["location"])
+        self.window.controller.set_active()
 #########################################################
 
 class ClientWindow(Tk):
@@ -141,6 +145,7 @@ class Controller:
         x,y = location
         self.view.move_pawn(x, y, pawn)
         self.model.move_pawn(pawn, location)
+        self.state = INACTIVE
         
     def controller_place_wall(self,location,orientation):
         x,y = location
