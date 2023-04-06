@@ -18,11 +18,13 @@ COLORBOARD = "#454545"
 WIDTHWALL = 10
 WIDTHLINE = 4
 COLORLINE = "#D4D4D4"
+COLORWALL = "#AA5372"
 LENGTH_LINE = 10
 PIXEL_BOARD_X_LENGTH = X_AXIS_LENGTH * SIZESQUARE
 PIXEL_BOARD_Y_LENGTH = Y_AXIS_LENGTH * SIZESQUARE
 X_OFFSET = 10
 Y_OFFSET = 10
+SPACING = 4
 
 HOST, PORT = "localhost", "31425"
 NICKNAME = "nick"
@@ -104,9 +106,22 @@ class Controller:
         self.state = INITIAL
     
     def board_click(self,evt):
-        if (self.state == ACTIVE) and (self.detect_clicked_hole(evt.x,evt.y)):
-            pass
-    
+        if (self.state == ACTIVE):
+            if (self.move == PLACE_WALL_UP): 
+                hole = self.detect_clicked_hole(evt.x,evt.y)
+                if (hole != None):
+                    if self.model.test_add_wall((hole[0],hole[1]),"UP"):
+                        self.view.place_wall(hole[0],hole[1],self.move)  
+                        self.model.add_wall((hole[0],hole[1]),"UP")
+
+            if (self.move == PLACE_WALL_ACROSS): 
+                hole = self.detect_clicked_hole(evt.x,evt.y)
+                if (hole != None):
+                    if self.model.test_add_wall((hole[0],hole[1]),"ACROSS"):
+                        self.view.place_wall(hole[0],hole[1],self.move)  
+                        self.model.add_wall((hole[0],hole[1]),"ACROSS")
+
+
     def detect_clicked_hole(self,pixel_x,pixel_y):
         for x in range(1,X_AXIS_LENGTH):
             x_minus = x*SIZESQUARE + X_OFFSET - LENGTH_LINE
@@ -168,6 +183,27 @@ class View:
     def move_pawn(self,x,y,pawn_id):
         self.delete_pawn(pawn_id)
         self.pawns[pawn_id] = self.draw_pawn(x,y)
+    
+    def place_wall(self,x,y,orientation):
+            if type == PLACE_WALL_ACROSS:
+                self.place_horizontal_wall(x,y)
+            elif type == PLACE_WALL_UP:
+                self.place_vertical_wall(x,y)
+    
+    def place_vertical_wall(self,x,y):
+        x0 = x*SIZESQUARE +X_OFFSET + WIDTHLINE
+        y0 = y*SIZESQUARE +Y_OFFSET +SPACING
+        x1 = x*SIZESQUARE +X_OFFSET - WIDTHLINE
+        y1 = (y+2)*SIZESQUARE +Y_OFFSET -SPACING
+        self.canvas_board.create_rectangle(x0,y0,x1,y1,fill = COLORWALL)
+
+
+    def place_horizontal_wall(self,x,y):
+        y0 = y*SIZESQUARE +Y_OFFSET + WIDTHLINE
+        x0 = x*SIZESQUARE +X_OFFSET +SPACING
+        y1 = y*SIZESQUARE +Y_OFFSET - WIDTHLINE
+        x1 = (x+2)*SIZESQUARE +X_OFFSET -SPACING
+        self.canvas_board.create_rectangle(x0,y0,x1,y1,fill = COLORWALL)
         
 class Model :
     def __init__(self):

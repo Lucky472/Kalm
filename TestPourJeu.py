@@ -57,22 +57,15 @@ class View:
         self.delete_pawn(pawn_id)
         self.pawns[pawn_id] = self.draw_pawn(x,y)
 
-    def place_wall(self,x,y,orientation,color):
+    def place_wall(self,x,y,orientation):
         if type == "horizontal":
-            self.place_horizontal_wall(x,y,color)
+            self.place_horizontal_wall(x,y)
         elif type == "vertical":
-            self.place_vertical_wall(x,y,color)
+            self.place_vertical_wall(x,y)
     
     def place_vertical_wall(self,x,y):
         x0 = x*SIZESQUARE +X_OFFSET + WIDTHLINE
         y0 = y*SIZESQUARE +Y_OFFSET +SPACING
-        """x1 = x*SIZESQUARE +X_OFFSET - WIDTHLINE
-        y1 = (y+1)*SIZESQUARE +Y_OFFSET -SPACING
-        self.canvas_board.create_rectangle(x0,y0,x1,y1,fill = COLORWALL)
-        #place la barre du haut
-        x0 = x*SIZESQUARE +X_OFFSET + WIDTHLINE
-        y0 = (y+1)*SIZESQUARE +Y_OFFSET +SPACING
-        """
         x1 = x*SIZESQUARE +X_OFFSET - WIDTHLINE
         y1 = (y+2)*SIZESQUARE +Y_OFFSET -SPACING
         self.canvas_board.create_rectangle(x0,y0,x1,y1,fill = COLORWALL)
@@ -81,14 +74,6 @@ class View:
     def place_horizontal_wall(self,x,y):
         y0 = y*SIZESQUARE +Y_OFFSET + WIDTHLINE
         x0 = x*SIZESQUARE +X_OFFSET +SPACING
-        """y1 = y*SIZESQUARE +Y_OFFSET - WIDTHLINE
-        x1 = (x+1)*SIZESQUARE +X_OFFSET -SPACING
-        self.canvas_board.create_rectangle(x0,y0,x1,y1,fill = COLORWALL)
-        
-        #place la barre de gauche
-        y0 = y*SIZESQUARE +Y_OFFSET + WIDTHLINE
-        x0 = (x+1)*SIZESQUARE +X_OFFSET +SPACING
-        """
         y1 = y*SIZESQUARE +Y_OFFSET - WIDTHLINE
         x1 = (x+2)*SIZESQUARE +X_OFFSET -SPACING
         self.canvas_board.create_rectangle(x0,y0,x1,y1,fill = COLORWALL)
@@ -249,5 +234,6 @@ for x in range(1,X_AXIS_LENGTH):
                 view.canvas_board.create_rectangle(x_minus,y0,x_maxus,y1,fill = "#000000")
             else :
                 view.canvas_board.create_rectangle(x_minus,y0,x_maxus,y1,fill = "#682925")
+
 window.mainloop()
 
