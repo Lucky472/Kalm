@@ -159,9 +159,11 @@ class Controller:
         self.client.Send({"action":"send_to_opponent", "sent_action":"placed_wall", "location":location, "orientation":orientation})
     
     def set_wall_vertical(self):
+        self.view.canvas_board.delete("deletable_dots")
         self.move = PLACE_WALL_UP
                 
     def set_wall_horizontal(self):
+        self.view.canvas_board.delete("deletable_dots")
         self.move = PLACE_WALL_ACROSS
     
     def set_move_pawn(self):
