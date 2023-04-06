@@ -167,14 +167,17 @@ class Controller:
         self.client.Send({"action":"send_to_opponent", "sent_action":"moved_pawn", "location":location})
 
     def set_wall_vertical(self):
+        self.view.canvas_board.delete("deletable_dots")
         self.move = PLACE_WALL_UP
                 
-    def set_wall_horisontal(self):
+    def set_wall_horizontal(self):
+        self.view.canvas_board.delete("deletable_dots")
         self.move = PLACE_WALL_ACROSS
     
     def set_move_pawn(self):
         self.move = MOVE_PAWN
-        self.view.show_plays()
+        x,y = self.model.pawns[self.my_pawn].coords
+        self.view.show_plays(x,y)
         
 class View:
     def __init__(self,window,color,oponent_color):
