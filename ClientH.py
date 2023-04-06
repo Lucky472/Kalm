@@ -34,7 +34,6 @@ BASECOLOR = "#ca7511"
 
 INITIAL=0
 ACTIVE=1
-INACTIVE=2
 DEAD=-1
 INACTIVE = 2
 
@@ -103,7 +102,7 @@ class ClientWindow(Tk):
         exit()    
 
 class Controller:
-    def __init__(self,window,client):
+    def __init__(self,window,client,my_pawn,opponent_pawn):
         self.window = window
         self.client = client
         self.model = Model()
@@ -111,6 +110,8 @@ class Controller:
         self.view.canvas_board.bind("<Button-1>",self.board_click)
         self.move = MOVE_PAWN
         self.state = INITIAL
+        self.my_pawn = my_pawn
+        self.opponent_pawn = opponent_pawn
     
     def set_active(self):
         self.state = ACTIVE
@@ -129,6 +130,11 @@ class Controller:
                     if self.model.test_add_wall((hole[0],hole[1]),"ACROSS"):
                         self.controller_place_wall((hole[0],hole[1]),"ACROSS")
                         self.send_placed_wall((hole[0],hole[1]),"ACROSS")
+            if self.move == MOVE_PAWN :
+                square = self.detect_clicked_square(evt.x,evt.y)
+                if square != None and square in self.model.accessible_from(self.model.pawns[self.my_pawn]):
+                    
+                    
     
     def controller_place_wall(self,location,orientation):
         x,y = location
