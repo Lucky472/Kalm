@@ -29,7 +29,7 @@ class View:
         # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6)
         self.pawns = {"DOWN":self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1,self.color),"UP":self.draw_pawn(X_AXIS_LENGTH // 2, 0,self.oponent_color)}
         #Pour gérer la couleur faudra savoir la couleur du bas et celle du haut
-
+        self.deletable_dots = []
         
     def draw_board(self):
         #Lignes verticales
@@ -91,8 +91,12 @@ class View:
         """
         for square in playable_list:
             x0,y0 = self.get_center(square[0],square[1])
-            id_ =  self.canvas_board.create_oval(x0 - RADIUSDOTS,y0-RADIUSDOTS,x0 + RADIUSDOTS,y0 + RADIUSDOTS,fill = COLORDOT,id="deletable_dots")
+            self.deletable_dots.append(self.canvas_board.create_oval(x0 - RADIUSDOTS,y0-RADIUSDOTS,x0 + RADIUSDOTS,y0 + RADIUSDOTS,fill = COLORDOT))
 
+    def delete_deletable_dots(self):
+        for x in self.deletable_dots:
+            self.canvas_board.delete(x)
+            
 class Model :
     def __init__(self):
         self.board = self.new_board()

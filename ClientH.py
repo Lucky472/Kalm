@@ -141,6 +141,7 @@ class Controller:
                     self.send_moved_pawn(square)
 
     def controller_move_pawn(self,pawn, location):
+        self.view.delete_deletable_dots()
         x,y = location
         self.view.move_pawn(x, y, pawn)
         self.model.move_pawn(pawn, location)
@@ -172,11 +173,11 @@ class Controller:
         self.client.Send({"action":"send_to_opponent", "sent_action":"moved_pawn", "location":location})
 
     def set_wall_vertical(self):
-        self.view.canvas_board.delete("deletable_dots")
+        self.view.delete_deletable_dots()
         self.move = PLACE_WALL_UP
                 
     def set_wall_horizontal(self):
-        self.view.canvas_board.delete("deletable_dots")
+        self.view.delete_deletable_dots()
         self.move = PLACE_WALL_ACROSS
     
     def set_move_pawn(self):
@@ -194,6 +195,8 @@ class View:
         self.pawns = {"DOWN":self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1 ),"UP":self.draw_pawn(X_AXIS_LENGTH // 2, 0)}
         self.color = color 
         self.oponent_color = oponent_color
+        self.deletable_dots = []
+
     def draw_board(self):
         #Lignes verticales
         for x in range(X_AXIS_LENGTH+1):
@@ -238,7 +241,11 @@ class View:
         """
         for square in playable_list:
             x0,y0 = self.get_center(square[0],square[1])
-            id_ =  self.canvas_board.create_oval(x0 - RADIUSDOTS,y0-RADIUSDOTS,x0 + RADIUSDOTS,y0 + RADIUSDOTS,fill = COLORDOT)
+            self.deletable_dots.append(self.canvas_board.create_oval(x0 - RADIUSDOTS,y0-RADIUSDOTS,x0 + RADIUSDOTS,y0 + RADIUSDOTS,fill = COLORDOT))
+
+    def delete_deletable_dots(self):
+        for x in self.deletable_dots:
+            self.canvas_board.delete(x)
 
     def place_vertical_wall(self,x,y):
         x0 = x*SIZESQUARE +X_OFFSET + WIDTHLINE
