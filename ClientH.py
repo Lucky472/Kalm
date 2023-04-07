@@ -422,19 +422,27 @@ class Buttons :
         self.buttons()
         self.entries()
         self.packall()
-        
+
     def frame(self):
         self.frame=Frame(self.menu.Window,bg='#41B77F')
+        self.f_liste=Frame(self.window,bg='#41B77F')
+        self.f_adversaire=Frame(self.frame,bg='#41B77F')
         self.f_pseudo= Frame(self.frame,bg='#41B77F')
         self.f_host = Frame(self.frame,bg='#41B77F')
         self.f_port = Frame(self.frame,bg='#41B77F')
         
+        
     def text(self):
-        self.Labeltitle1=Label(self.frame,text='Menu du jeu saucisse',font=("arial",30),bg='#41B77F',fg='white')
+        self.Labeltitle1=Label(self.frame,text='Menu du jeu quoridor',font=("arial",30),bg='#41B77F',fg='white')
         self.Labeltitle2=Label(self.frame,text='Preparez vous à jouer, regarder les règles et choississez votre couleur',font=("arial",10),bg='#41B77F',fg='white')
         self.L_pseudo=Label(self.frame,text='choisi ton pseudo',font=("arial",19),bg='#41B77F',fg='white')
         self.L_host=Label(self.frame,text='host',font=("arial",19),bg='#41B77F',fg='white')
         self.L_port = Label(self.frame,text='port',font=("arial",19),bg='#41B77F',fg='white')
+        self.L_adversaire=Label(self.frame,text='choisis ton adversaire',font=("arial",19),bg='#41B77F',fg='white')
+
+        self.menu.trier_liste_score(self.menu.dico_list) 
+        self.menu.classe_liste(self.menu.dico_list,self.menu.Liste_score_joueur)
+        self.afficher_liste_joueur(self.menu.dico_list,self.menu.Liste_joueur)
 
     def buttons(self):
         self.B_quitter=Button(self.menu.Window,text='quitter',command=self.menu.Window.destroy,bg='#ed1111')
@@ -445,12 +453,14 @@ class Buttons :
         self.e_pseudo=Entry(self.f_pseudo,font=("arial",20),bg='#41B77F',fg='white')
         self.e_host = Entry(self.f_host,font=("arial",20),bg='#41B77F',fg='white')
         self.e_port = Entry(self.f_port,font=("arial",20),bg='#41B77F',fg='white')
+        self.e_adversaire=Entry(self.f_adversaire,font=("arial",20),bg='#41B77F',fg='white')
         self.e_pseudo.insert(0,NICKNAME)
         self.e_host.insert(0,HOST)
         self.e_port.insert(0,PORT)
 
     def packall (self):
         self.frame.pack(expand=YES)
+        self.f_liste.pack(side=RIGHT)
         self.Labeltitle1.pack()
         self.B_quitter.pack(side=LEFT)
         self.Labeltitle2.pack()
@@ -491,6 +501,7 @@ class Menu :
         self.enregistrer_pseudo()
         self.enregistrer_port()
         self.enregistrer_host()
+        self.enregistrer_adversaire()
         
         if self.nickname != NICKNAME :
             self.client_window = ClientWindow(self.host, self.port, self.color, self.nickname)
@@ -514,6 +525,32 @@ class Menu :
     def enregistrer_port(self):
         self.port=self.buttons.e_port.get()
 
+    def enregistrer_adversaire(self):
+        self.adversaire=self.e_adversaire.get()
+    
+    def afficher_liste_joueur(self,dico_list,Liste_joueur):
+        for i in range(len(self.Liste_joueur)-2,-1,-2):
+            self.L_joueur=Label(self.buttons.f_liste,text=self.Liste_joueur[i]+" "+ str(self.Liste_joueur[i+1]),font=("arial",10),bg='#4065A4',fg='black',bd=2,relief=SUNKEN)
+            self.L_joueur.pack(pady=2)
+
+    def trier_liste_score(self,dico_list):
+        self.Liste_score_joueur=[]
+        for i in range(0,len(self.dico_list)):
+            a=self.dico_list[i]["score"]
+            self.Liste_score_joueur.append(a)
+        self.Liste_score_joueur.sort()
+        print (self.Liste_score_joueur)
+
+    def classe_liste(self,dico_list,Liste_score_joueur):
+        self.Liste_joueur=[]
+        for i in Liste_score_joueur:
+            for j in range(0,len(self.dico_list)):
+                if i==self.dico_list[j]["score"] and self.dico_list[j]["name"] not in self.Liste_joueur:
+                    a=self.dico_list[j]["name"]
+                    self.Liste_joueur.append(a)
+                    b=self.dico_list[j]["score"]
+                    self.Liste_joueur.append(b)
+        print(self.Liste_joueur)
 
 
 # get command line argument of client, port
