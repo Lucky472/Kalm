@@ -14,15 +14,19 @@ BOARD_X_LENGTH = 2 * X_AXIS_LENGTH - 1
 BOARD_Y_LENGTH = 2 * Y_AXIS_LENGTH - 1
 SIZESQUARE = 50
 RADIUSPAWN = 17
+RADIUSDOTS = 5
+COLORDOT = "#EEEEEE"
 COLORBOARD = "#454545"
 WIDTHWALL = 10
 WIDTHLINE = 4
 COLORLINE = "#D4D4D4"
+COLORWALL = "#AA5372"
 LENGTH_LINE = 10
 PIXEL_BOARD_X_LENGTH = X_AXIS_LENGTH * SIZESQUARE
 PIXEL_BOARD_Y_LENGTH = Y_AXIS_LENGTH * SIZESQUARE
 X_OFFSET = 10
 Y_OFFSET = 10
+SPACING = 4
 
 HOST, PORT = "localhost", "31425"
 NICKNAME = "nick"
@@ -31,6 +35,7 @@ BASECOLOR = "#ca7511"
 INITIAL=0
 ACTIVE=1
 DEAD=-1
+INACTIVE = 2
 
 MOVE_PAWN = 0
 PLACE_WALL_UP = 1
@@ -78,15 +83,20 @@ class Client(ConnectionListener):
         print('Server disconnected')
         exit()
     
+    def Network_placed_wall(self,data):
+        self.window.controller.controller_place_wall(data["location"], data["orientation"])
+        self.window.controller.set_active()
+        
+    def Network_moved_pawn(self,data):
+        self.window.controller.controller_move_pawn(self.window.controller.opponent_pawn, data["location"])
+        self.window.controller.set_active()
 #########################################################
 
 class ClientWindow(Tk):
-    #c'est lui notre controller
     def __init__(self, host, port,color,nickname):
         Tk.__init__(self)
         self.client = Client(host, int(port), self,color,nickname)
-        self.controller = Controller(self)
-        
+        self.controller = Controller(self,self.client,"UP","DOWN")
 
     def myMainLoop(self):
         while self.client.state!=DEAD:   
@@ -96,35 +106,97 @@ class ClientWindow(Tk):
         exit()    
 
 class Controller:
-    def __init__(self,window):
+    def __init__(self,window,client,my_pawn,opponent_pawn):
+        self.window = window
+        self.client = client
         self.model = Model()
         self.view = View(window)
         self.view.canvas_board.bind("<Button-1>",self.board_click)
         self.move = MOVE_PAWN
         self.state = INITIAL
+        self.my_pawn = my_pawn
+        self.opponent_pawn = opponent_pawn
     
-    def board_click(self):
-        if self.state == ACTIVE :
-            pass
+    def set_active(self):
+        self.state = ACTIVE
     
+    def board_click(self,evt):
+        if (self.state == ACTIVE):
+            if (self.move == PLACE_WALL_UP): 
+                hole = self.detect_clicked_hole(evt.x,evt.y)
+                if (hole != None):
+                    if self.model.test_add_wall((hole[0],hole[1]),"UP"):
+                        self.controller_place_wall((hole[0],hole[1]),"UP")
+                        self.send_placed_wall((hole[0],hole[1]),"UP")
+            if (self.move == PLACE_WALL_ACROSS): 
+                hole = self.detect_clicked_hole(evt.x,evt.y)
+                if (hole != None):
+                    if self.model.test_add_wall((hole[0],hole[1]),"ACROSS"):
+                        self.controller_place_wall((hole[0],hole[1]),"ACROSS")
+                        self.send_placed_wall((hole[0],hole[1]),"ACROSS")
+            if self.move == MOVE_PAWN :
+                square = self.detect_clicked_square(evt.x,evt.y)
+                if square != None and square in self.model.accessible_from(self.model.pawns[self.my_pawn]):
+                    self.controller_move_pawn(self.my_pawn, square)
+                    self.send_moved_pawn(square)
+
+    def controller_move_pawn(self,pawn, location):
+        self.view.delete_deletable_dots()
+        x,y = location
+        self.view.move_pawn(x, y, pawn)
+        self.model.move_pawn(pawn, location)
+        self.state = INACTIVE
+        
+    def controller_place_wall(self,location,orientation):
+        x,y = location
+        self.view.place_wall(x,y,self.move)  
+        self.model.add_wall((x,y),orientation)
+        self.state = INACTIVE
+    
+    def detect_clicked_hole(self,pixel_x,pixel_y):
+        for x in range(1,X_AXIS_LENGTH):
+            x_minus = x*SIZESQUARE + X_OFFSET - LENGTH_LINE
+            x_maxus = (x)*SIZESQUARE + X_OFFSET + LENGTH_LINE
+            for y in range(1,Y_AXIS_LENGTH):
+                y_minus = y*SIZESQUARE + Y_OFFSET - LENGTH_LINE
+                y_maxus = (y)*SIZESQUARE + Y_OFFSET + LENGTH_LINE
+                if (pixel_x >= x_minus) and (pixel_x <= x_maxus):
+                    if (pixel_y >= y_minus) and (pixel_x <= y_maxus):
+                        return (x,y)
+        return None
+    
+    
+    def send_placed_wall(self,location,orientation):
+        self.client.Send({"action":"send_to_opponent", "sent_action":"placed_wall", "location":location, "orientation":orientation})
+    
+    def send_moved_pawn(self,location):
+        self.client.Send({"action":"send_to_opponent", "sent_action":"moved_pawn", "location":location})
+
     def set_wall_vertical(self):
+        self.view.delete_deletable_dots()
         self.move = PLACE_WALL_UP
                 
-    def set_wall_horisontal(self):
+    def set_wall_horizontal(self):
+        self.view.delete_deletable_dots()
         self.move = PLACE_WALL_ACROSS
     
     def set_move_pawn(self):
         self.move = MOVE_PAWN
+        x,y = self.model.pawns[self.my_pawn].coords
+        self.view.show_plays(x,y)
         
 class View:
-    def __init__(self,window):
+    def __init__(self,window,color,oponent_color):
         self.window = window
         self.canvas_board = Canvas(self.window,height = PIXEL_BOARD_Y_LENGTH + 2*Y_OFFSET,width =  PIXEL_BOARD_X_LENGTH + 2*X_OFFSET,bg =COLORBOARD )
         self.draw_board()
         self.canvas_.pack()
-        # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6)
+        # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6) pour une taille de 7 cases
         self.pawns = {"DOWN":self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1 ),"UP":self.draw_pawn(X_AXIS_LENGTH // 2, 0)}
-        print(self.pawns)
+        self.color = color 
+        self.oponent_color = oponent_color
+        self.deletable_dots = []
+
     def draw_board(self):
         #Lignes verticales
         for x in range(X_AXIS_LENGTH+1):
@@ -156,6 +228,40 @@ class View:
     def move_pawn(self,x,y,pawn_id):
         self.delete_pawn(pawn_id)
         self.pawns[pawn_id] = self.draw_pawn(x,y)
+    
+    def place_wall(self,x,y,orientation):
+            if type == PLACE_WALL_ACROSS:
+                self.place_horizontal_wall(x,y)
+            elif type == PLACE_WALL_UP:
+                self.place_vertical_wall(x,y)
+
+    def show_plays(self,playable_list):
+        """
+            affiche les points atteignables depuis une position, prend une liste de tuple en argument
+        """
+        for square in playable_list:
+            x0,y0 = self.get_center(square[0],square[1])
+            self.deletable_dots.append(self.canvas_board.create_oval(x0 - RADIUSDOTS,y0-RADIUSDOTS,x0 + RADIUSDOTS,y0 + RADIUSDOTS,fill = COLORDOT))
+
+    def delete_deletable_dots(self):
+        for x in self.deletable_dots:
+            self.canvas_board.delete(x)
+
+    def place_vertical_wall(self,x,y):
+        x0 = x*SIZESQUARE +X_OFFSET + WIDTHLINE
+        y0 = y*SIZESQUARE +Y_OFFSET +SPACING
+        x1 = x*SIZESQUARE +X_OFFSET - WIDTHLINE
+        y1 = (y+2)*SIZESQUARE +Y_OFFSET -SPACING
+        self.canvas_board.create_rectangle(x0,y0,x1,y1,fill = COLORWALL)
+
+
+    def place_horizontal_wall(self,x,y):
+        y0 = y*SIZESQUARE +Y_OFFSET + WIDTHLINE
+        x0 = x*SIZESQUARE +X_OFFSET +SPACING
+        y1 = y*SIZESQUARE +Y_OFFSET - WIDTHLINE
+        x1 = (x+2)*SIZESQUARE +X_OFFSET -SPACING
+        self.canvas_board.create_rectangle(x0,y0,x1,y1,fill = COLORWALL)
+        
 class Model :
     def __init__(self):
         self.board = self.new_board()
