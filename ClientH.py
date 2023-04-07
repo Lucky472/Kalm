@@ -137,7 +137,6 @@ class ClientWindow(Tk):
         """
         self.client.Send({"action":"new_game_request","challenged":opponent_nickname})
 
-
     def challenge_denied(opponent):
         """
         opponent est l'élément de dico avec tt les attributs du challenger
