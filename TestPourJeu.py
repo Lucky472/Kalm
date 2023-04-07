@@ -28,6 +28,7 @@ WIDTHFRAME = BOARD_X_LENGTH
 HEIGHTFRAME = BOARD_Y_LENGTH//4
 X_OFFSET = 10
 Y_OFFSET = 10
+SPACING = 4
 
 
 HOST, PORT = "localhost", "31425"
@@ -425,7 +426,7 @@ class Menu :
         self.local_server = None
         self.has_defier = False
         self.Window.mainloop()
-        self.dico_list = [{["name"]:"matteo",["score"]:0}, {["name"]:"matte",["score"]:1}]
+        self.dico_list = [{"name":"matteo","score":0}, {"name":"matte","score":1}]
         
     def open_window(self):
         self.enregistrer_pseudo()
@@ -501,9 +502,10 @@ view.place_vertical_wall(5,1)
 for x in range(1,X_AXIS_LENGTH):
      x_minus = x*SIZESQUARE + X_OFFSET - LENGTH_LINE
      x_maxus = (x)*SIZESQUARE + X_OFFSET + LENGTH_LINE
-     for y in range(1,Y_AXIS_LENGTH):
+     for y in range(0,Y_AXIS_LENGTH):
             y0 = y*SIZESQUARE + Y_OFFSET - LENGTH_LINE
             y1 = (y)*SIZESQUARE + Y_OFFSET + LENGTH_LINE
+            view.show_plays([(x,y)])
             if x%2 == 0:
                 view.canvas_board.create_rectangle(x_minus,y0,x_maxus,y1,fill = "#000000")
             else :
@@ -511,9 +513,5 @@ for x in range(1,X_AXIS_LENGTH):
 """
 
 menu = Menu()
-view = View()
-
-view.show_plays([(1,1),(2,2),(3,3)])
-window.mainloop()
 
 
