@@ -28,7 +28,7 @@ WIDTHFRAME = BOARD_X_LENGTH
 HEIGHTFRAME = BOARD_Y_LENGTH//4
 X_OFFSET = 10
 Y_OFFSET = 10
-<<<<<<< HEAD
+
 
 HOST, PORT = "localhost", "31425"
 NICKNAME = "nick"
@@ -130,20 +130,18 @@ class Controller:
     def set_move_pawn(self):
         self.move = MOVE_PAWN
         
-=======
-SPACING = 4
->>>>>>> 9a2a399b278f7d825b23eea79257c7d233850271
+
 class View:
     def __init__(self,window,color,oponent_color):
         self.window = window
         self.canvas_board = Canvas(self.window,height = PIXEL_BOARD_Y_LENGTH + 2*Y_OFFSET,width =  PIXEL_BOARD_X_LENGTH + 2*X_OFFSET,bg =COLORBOARD )
         self.draw_board()
-<<<<<<< HEAD
+
         self.canvas_.pack()
         # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6)
         self.pawns = {"DOWN":self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1 ),"UP":self.draw_pawn(X_AXIS_LENGTH // 2, 0)}
         print(self.pawns)
-=======
+
         self.canvas_board.pack()
         self.color = color 
         self.oponent_color = oponent_color
@@ -152,7 +150,7 @@ class View:
         #Pour gérer la couleur faudra savoir la couleur du bas et celle du haut
         self.deletable_dots = []
         
->>>>>>> 9a2a399b278f7d825b23eea79257c7d233850271
+
     def draw_board(self):
         #Lignes verticales
         for x in range(X_AXIS_LENGTH+1):
@@ -168,13 +166,11 @@ class View:
                 x0 = x*SIZESQUARE + LENGTH_LINE + X_OFFSET +1
                 x1 = (x+1)*SIZESQUARE - LENGTH_LINE + X_OFFSET +1
                 self.canvas_board.create_line(x0,y01,x1,y01,fill = COLORLINE,width=WIDTHLINE)
-<<<<<<< HEAD
 
-    def draw_pawn(self,x,y):
-=======
+
+
         
     def draw_pawn(self,x,y,color):
->>>>>>> 9a2a399b278f7d825b23eea79257c7d233850271
         x0,y0 = self.get_center(x,y)
         idd =  self.canvas_board.create_oval(x0 - RADIUSPAWN,y0-RADIUSPAWN,x0 + RADIUSPAWN,y0 + RADIUSPAWN,fill = color)
         return idd
@@ -190,10 +186,8 @@ class View:
     def move_pawn(self,x,y,pawn_id):
         self.delete_pawn(pawn_id)
         self.pawns[pawn_id] = self.draw_pawn(x,y)
-<<<<<<< HEAD
-        
-=======
 
+        
     def place_wall(self,x,y,orientation):
         if type == "horizontal":
             self.place_horizontal_wall(x,y)
@@ -227,7 +221,7 @@ class View:
         for x in self.deletable_dots:
             self.canvas_board.delete(x)
             
->>>>>>> 9a2a399b278f7d825b23eea79257c7d233850271
+
 class Model :
     def __init__(self):
         self.board = self.new_board()
@@ -387,37 +381,12 @@ class Buttons :
         self.L_host=Label(self.frame,text='host',font=("arial",19),bg='#41B77F',fg='white')
         self.L_port = Label(self.frame,text='port',font=("arial",19),bg='#41B77F',fg='white')
 
-<<<<<<< HEAD
     def buttons(self):
         self.B_quitter=Button(self.menu.Window,text='quitter',command=self.menu.Window.destroy,bg='#ed1111')
         self.B_couleur=Button(self.frame,text='Selectionner une couleur',command=self.menu.change_color,bg='#4065A4')
         self.B_jouer = Button(self.menu.Window,text='   Jouer   ',command= self.menu.open_window,bg='#4065A4')
-=======
-window = Tk()
-view = View(window,"#0000FF","#FF00FF")
-"""
-tests
-view.place_horizontal_wall(3,2)
-view.place_horizontal_wall(1,2)
-view.place_vertical_wall(5,1)
-"""
-"""
-for x in range(1,X_AXIS_LENGTH):
-     x_minus = x*SIZESQUARE + X_OFFSET - LENGTH_LINE
-     x_maxus = (x)*SIZESQUARE + X_OFFSET + LENGTH_LINE
-     for y in range(1,Y_AXIS_LENGTH):
-            y0 = y*SIZESQUARE + Y_OFFSET - LENGTH_LINE
-            y1 = (y)*SIZESQUARE + Y_OFFSET + LENGTH_LINE
-            if x%2 == 0:
-                view.canvas_board.create_rectangle(x_minus,y0,x_maxus,y1,fill = "#000000")
-            else :
-                view.canvas_board.create_rectangle(x_minus,y0,x_maxus,y1,fill = "#682925")
-"""
-
-view.show_plays([(1,1),(2,2),(3,3)])
-window.mainloop()
->>>>>>> 9a2a399b278f7d825b23eea79257c7d233850271
-
+        
+        
     def entries(self):
         self.e_pseudo=Entry(self.f_pseudo,font=("arial",20),bg='#41B77F',fg='white')
         self.e_host = Entry(self.f_host,font=("arial",20),bg='#41B77F',fg='white')
@@ -522,7 +491,28 @@ else:
 
 """client_window = ClientWindow(host, port)
 client_window.myMainLoop()
+
+tests
+view.place_horizontal_wall(3,2)
+view.place_horizontal_wall(1,2)
+view.place_vertical_wall(5,1)
+
+
+for x in range(1,X_AXIS_LENGTH):
+     x_minus = x*SIZESQUARE + X_OFFSET - LENGTH_LINE
+     x_maxus = (x)*SIZESQUARE + X_OFFSET + LENGTH_LINE
+     for y in range(1,Y_AXIS_LENGTH):
+            y0 = y*SIZESQUARE + Y_OFFSET - LENGTH_LINE
+            y1 = (y)*SIZESQUARE + Y_OFFSET + LENGTH_LINE
+            if x%2 == 0:
+                view.canvas_board.create_rectangle(x_minus,y0,x_maxus,y1,fill = "#000000")
+            else :
+                view.canvas_board.create_rectangle(x_minus,y0,x_maxus,y1,fill = "#682925")
 """
+
+view.show_plays([(1,1),(2,2),(3,3)])
+window.mainloop()
+
 
 menu = Menu()
 view = View()
