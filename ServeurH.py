@@ -4,6 +4,8 @@ from time import sleep, localtime
 from PodSixNet.Server import Server
 from PodSixNet.Channel import Channel
 
+BASE_SCORE = 1000
+
 class ClientChannel(Channel):
     """
     This is the server representation of a connected client.
@@ -12,6 +14,11 @@ class ClientChannel(Channel):
     
     def Close(self):
         self._server.DelPlayer(self)
+    
+    def Network_init_player(self,data):
+        self.nickname = data["nickname"]
+        self.color = data["color"]
+        self.score = BASE_SCORE
     
     def Network_send_to_opponent(self,data):
         data["who"] = self.opponent
@@ -24,6 +31,14 @@ class ClientChannel(Channel):
         
     def Network_send_to_others(self,data):
         self.SendToOthers(data)
+
+    def Network_new_game_request(self,data):
+        """
+        data contient : joueur défié et c'est tout
+        """
+        opponent = data["challenged"]
+        self._server.challenge_request(self,opponent)
+
 
 class MyServer(Server):
     channelClass = ClientChannel
@@ -38,7 +53,6 @@ class MyServer(Server):
     def AddPlayer(self, player):
         print("New Player connected")
         self.players[player] = True
-        self.listplayers.append()
     
     def PrintPlayers(self):
         print("players' nicknames :",[p.nickname for p in self.players])
@@ -61,6 +75,25 @@ class MyServer(Server):
             self.Pump()
             sleep(0.001)
 
+    def challenge_request(self,challenger,player2_nick):
+        player2 = [p for p in self.players if p.nickname == player2_nick][0]
+        if self.can_challenge(challenger,player2):
+            if self.is_forced_challenge(challenger,player2) :
+                player2.opponent = challenger.nickname
+                challenger.opponent = player2.nickname
+                player2.Send({"action":"forced_challenge"})
+                challenger.Send({"action":"forced_challenge"})
+            else :
+                player2.Send({"action":"challenge","opponent":challenger})
+        else :
+            challenger.Send({"action":"cannot_challenge","opponent":player2})
+    
+    def can_challenge(self,challenger,player2):
+        return True
+    
+    def is_forced_challenge(self,challenger,player2):
+        return True
+        
 """
 class Player :
     def __init__(self,idi,nickname,color,score,state):

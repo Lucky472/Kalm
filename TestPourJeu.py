@@ -510,9 +510,10 @@ for x in range(1,X_AXIS_LENGTH):
                 view.canvas_board.create_rectangle(x_minus,y0,x_maxus,y1,fill = "#682925")
 """
 
+menu = Menu()
+view = View()
+
 view.show_plays([(1,1),(2,2),(3,3)])
 window.mainloop()
 
 
-menu = Menu()
-view = View()
