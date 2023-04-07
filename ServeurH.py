@@ -81,8 +81,8 @@ class MyServer(Server):
             if self.is_forced_challenge(challenger,player2) :
                 player2.opponent = challenger.nickname
                 challenger.opponent = player2.nickname
-                player2.Send({"action":"forced_challenge"})
-                challenger.Send({"action":"forced_challenge"})
+                player2.Send({"action":"launch_game"})
+                challenger.Send({"action":"launch_game"})
             else :
                 player2.Send({"action":"challenge","opponent":challenger})
         else :
