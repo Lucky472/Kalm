@@ -450,7 +450,7 @@ class Buttons :
 
     def frame(self):
         self.frame=Frame(self.menu.Window,bg='#41B77F')
-        self.f_liste=Frame(self.window,bg='#41B77F')
+        self.f_liste=Frame(self.frame,bg='#41B77F')
         self.f_adversaire=Frame(self.frame,bg='#41B77F')
         self.f_pseudo= Frame(self.frame,bg='#41B77F')
         self.f_host = Frame(self.frame,bg='#41B77F')
@@ -465,9 +465,10 @@ class Buttons :
         self.L_port = Label(self.frame,text='port',font=("arial",19),bg='#41B77F',fg='white')
         self.L_adversaire=Label(self.frame,text='choisis ton adversaire',font=("arial",19),bg='#41B77F',fg='white')
 
-        self.menu.trier_liste_score(self.menu.dico_list) 
-        self.menu.classe_liste(self.menu.dico_list,self.menu.Liste_score_joueur)
-        self.afficher_liste_joueur(self.menu.dico_list,self.menu.Liste_joueur)
+    def afficher_liste_joueur(self,Liste_joueur):
+        for i in range(len(Liste_joueur)-2,-1,-2):
+            self.L_joueur=Label(self.f_liste,text=Liste_joueur[i]+" "+ str(Liste_joueur[i+1]),font=("arial",10),bg='#4065A4',fg='black',bd=2,relief=SUNKEN)
+            self.L_joueur.pack(pady=2)
 
     def buttons(self):
         self.B_quitter=Button(self.menu.Window,text='quitter',command=self.menu.Window.destroy,bg='#ed1111')
@@ -482,6 +483,7 @@ class Buttons :
         self.e_pseudo.insert(0,NICKNAME)
         self.e_host.insert(0,HOST)
         self.e_port.insert(0,PORT)
+        
 
     def packall (self):
         self.frame.pack(expand=YES)
@@ -499,7 +501,11 @@ class Buttons :
         self.L_port.pack()
         self.e_port.pack()
         self.f_port.pack()
+        self.L_adversaire.pack()
+        self.e_adversaire.pack()
+        self.f_adversaire.pack()
         self.B_jouer.pack(side=BOTTOM)
+        
 
 class Menu :
     def __init__(self):
@@ -507,10 +513,13 @@ class Menu :
         self.Window.geometry("520x500")
         self.Window.title("menu principal du jeu")
         self.Window.config(background='#41B77F')
+        self.dico_list=[{"name":"matteo","score":2},{"name":"killian","score":13},{"name":"adrien","score":12},{"name":"lucas","score":4}]
         self.buttons = Buttons(self)
         self.color = BASECOLOR
         self.local_server = None
         self.has_defier = False
+        # sert juste pour visualiser, actualise_list sera appelé par le serveur à chaque fois
+        self.actualise_list(self.dico_list)
         self.Window.mainloop()  
     
     def open_window(self):
@@ -520,6 +529,7 @@ class Menu :
         self.enregistrer_adversaire()
         
         if self.nickname != NICKNAME :
+            # va falloir mettre adversaire en argument
             self.client_window = ClientWindow(self.host, self.port, self.color, self.nickname)
             self.client_window.myMainLoop()
             
@@ -542,17 +552,36 @@ class Menu :
         self.port=self.buttons.e_port.get()
 
     def enregistrer_adversaire(self):
-        self.adversaire=self.e_adversaire.get()
+        self.adversaire=self.buttons.e_adversaire.get()
     
-    def afficher_liste_joueur(self,dico_list,Liste_joueur):
-        for i in range(len(self.Liste_joueur)-2,-1,-2):
-            self.L_joueur=Label(self.buttons.f_liste,text=self.Liste_joueur[i]+" "+ str(self.Liste_joueur[i+1]),font=("arial",10),bg='#4065A4',fg='black',bd=2,relief=SUNKEN)
-            self.L_joueur.pack(pady=2)
+    def actualise_list(self,dico_list):
+         #avant ça il faut supprimer l'ancienne liste affichée
+         self.buttons.afficher_liste_joueur(self.trier_liste(dico_list))       
 
-    def trier_liste_score(self,dico_list):
+    def trier_liste(self,dico_list):
+        """
+            Prend le dico_list et le trie pour qu'il soit affichable dans buttons
+        """
         self.Liste_score_joueur=[]
-        for i in range(0,len(self.dico_list)):
-            a=self.dico_list[i]["score"]
+        for i in range(0,len(dico_list)):
+            a=dico_list[i]["score"]
+            self.Liste_score_joueur.append(a)
+        self.Liste_score_joueur.sort()
+
+        self.Liste_joueur=[]
+        for i in self.Liste_score_joueur:
+            for j in range(0,len(dico_list)):
+                if i==dico_list[j]["score"] and dico_list[j]["name"] not in self.Liste_joueur:
+                    a=dico_list[j]["name"]
+                    self.Liste_joueur.append(a)
+                    b=dico_list[j]["score"]
+                    self.Liste_joueur.append(b)
+        return self.Liste_joueur
+    
+    """def trier_liste_score(self,dico_list):
+        self.Liste_score_joueur=[]
+        for i in range(0,len(dico_list)):
+            a=dico_list[i]["score"]
             self.Liste_score_joueur.append(a)
         self.Liste_score_joueur.sort()
         print (self.Liste_score_joueur)
@@ -560,14 +589,14 @@ class Menu :
     def classe_liste(self,dico_list,Liste_score_joueur):
         self.Liste_joueur=[]
         for i in Liste_score_joueur:
-            for j in range(0,len(self.dico_list)):
-                if i==self.dico_list[j]["score"] and self.dico_list[j]["name"] not in self.Liste_joueur:
-                    a=self.dico_list[j]["name"]
+            for j in range(0,len(dico_list)):
+                if i==dico_list[j]["score"] and dico_list[j]["name"] not in self.Liste_joueur:
+                    a=dico_list[j]["name"]
                     self.Liste_joueur.append(a)
-                    b=self.dico_list[j]["score"]
+                    b=dico_list[j]["score"]
                     self.Liste_joueur.append(b)
         print(self.Liste_joueur)
-
+    """
 
 # get command line argument of client, port
 if len(sys.argv) != 2:
