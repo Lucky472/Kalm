@@ -36,9 +36,16 @@ class ClientChannel(Channel):
         """
         data contient : joueur défié et c'est tout
         """
-        opponent = data["challenged"]
-        self._server.challenge_request(self,opponent)
+        opponent_nick = data["challenged"]
+        self._server.challenge_request(self,opponent_nick)
 
+    def Network_challenge_accepted(self,data):
+        challenged = [p for p in self.players if p.nickname == data["challenged"]][0]
+        opponent = data["opponent"]
+        self._server.launch_game(challenged,opponent)
+    
+    def Network_challenge_denied(self,data):
+        self._server.challenge_denied(self,data)
 
 class MyServer(Server):
     channelClass = ClientChannel
@@ -79,10 +86,7 @@ class MyServer(Server):
         player2 = [p for p in self.players if p.nickname == player2_nick][0]
         if self.can_challenge(challenger,player2):
             if self.is_forced_challenge(challenger,player2) :
-                player2.opponent = challenger.nickname
-                challenger.opponent = player2.nickname
-                player2.Send({"action":"launch_game"})
-                challenger.Send({"action":"launch_game"})
+                self.launch_game(challenger,player2)
             else :
                 player2.Send({"action":"challenge","opponent":challenger})
         else :
@@ -93,16 +97,15 @@ class MyServer(Server):
     
     def is_forced_challenge(self,challenger,player2):
         return True
-        
-"""
-class Player :
-    def __init__(self,idi,nickname,color,score,state):
-        self.idi = idi
-        self.nickname = nickname
-        self.color = color
-        self.score = score
-        self.state = state
-"""   
+    
+    def launch_game(self,challenger,player2):
+        player2.opponent = challenger.nickname
+        challenger.opponent = player2.nickname
+        player2.Send({"action":"launch_game","your_pawn":"UP","opponent_pawn":"DOWN"})
+        challenger.Send({"action":"launch_game","your_pawn":"DOWN","opponent_pawn":"UP"})
+
+    def challenge_denied(self,challenged,challenger):
+        challenger.Send({"action":"challenge_denied","opponent":challenged})
 
 
 # get command line argument of server, port

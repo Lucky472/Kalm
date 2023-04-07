@@ -92,13 +92,13 @@ class Client(ConnectionListener):
         self.window.controller.set_active()
         
     def Network_challenge(self,data):
-        if self.window.controller.ask_challenge(data["opponent"]):
-            self.Send({"action":"challenge_accepted","opponent":data["opponent"]})
+        if self.window.ask_challenge(data["opponent"]):
+            self.Send({"action":"challenge_accepted","challenged":self.nickname,"opponent":data["opponent"]})
         else :
             self.Send({"action":"challenge_denied","opponent":data["opponent"]})
     
     def Network_launch_game(self,data):
-        self.window.controller.launch_game
+        self.window.launch_game(data["your_pawn"],data["opponent_pawn"])
     
     def Network_cannot_challenge(self,data):
         """
@@ -106,13 +106,15 @@ class Client(ConnectionListener):
         (data["opponent"]) est le joueur ne pouvant pas être défié
         """
         pass
+    
+    def Network_challenge_denied(self,data):
+        self.window.challenge_denied(data["opponent"])
 #########################################################
 
 class ClientWindow(Tk):
     def __init__(self, host, port,color,nickname):
         Tk.__init__(self)
         self.client = Client(host, int(port), self,color,nickname)
-        self.controller = Controller(self,self.client,"UP","DOWN")
 
     def myMainLoop(self):
         while self.client.state!=DEAD:   
@@ -120,6 +122,30 @@ class ClientWindow(Tk):
             self.client.Loop()
             sleep(0.001)
         exit()    
+
+    def ask_challenge(self,opponent):
+        """
+        opponent est l'élément de dico avec tt les attributs du challenger
+        demande au joueur si il accepte le défi 
+        (si oui, return True
+         si non, return False)
+        """  
+
+    def send_challenge(self,opponent_nickname):
+        """
+        fonction appellée par le bouton d'envoi de défi
+        """
+        self.client.Send({"action":"new_game_request","challenged":opponent_nickname})
+
+
+    def challenge_denied(opponent):
+        """
+        opponent est l'élément de dico avec tt les attributs du challenger
+        informe le joueur que le challenge a été refusé
+        """
+
+    def launch_game(self,my_pawn,opponent_pawn):
+        self.controller = Controller(self,self.client,my_pawn,opponent_pawn)
 
 class Controller:
     def __init__(self,window,client,my_pawn,opponent_pawn):
@@ -401,7 +427,6 @@ class Model :
             return False
         return self.pathfind_test(location,targeted_y,all_accessibles=all_accessibles,new_accessibles=border)
 
-
 class Pawn :
     def __init__(self,coords):
         self.coords = coords
@@ -477,7 +502,6 @@ class Buttons :
         self.f_adversaire.pack()
         self.B_jouer.pack(side=BOTTOM)
 
-
 class Menu :
     def __init__(self):
         self.Window=Tk()
@@ -489,15 +513,7 @@ class Menu :
         self.color = BASECOLOR
         self.local_server = None
         self.has_defier = False
-        self.Window.mainloop()
-    
-    def ask_challenge(self,opponent):
-        """
-        opponent est l'élément de dico avec tt les attributs du challenger
-        demande au joueur si il accepte le défi 
-        (si oui, return True
-         si non, return False)
-        """    
+        self.Window.mainloop()  
     
     def open_window(self):
         self.enregistrer_pseudo()
