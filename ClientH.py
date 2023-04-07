@@ -561,41 +561,21 @@ class Menu :
         """
             Prend le dico_list et le trie pour qu'il soit affichable dans buttons
         """
-        self.Liste_score_joueur=[]
+        Liste_score_joueur=[]
         for i in range(0,len(dico_list)):
             a=dico_list[i]["score"]
-            self.Liste_score_joueur.append(a)
-        self.Liste_score_joueur.sort()
+            Liste_score_joueur.append(a)
+        Liste_score_joueur.sort()
 
-        self.Liste_joueur=[]
-        for i in self.Liste_score_joueur:
-            for j in range(0,len(dico_list)):
-                if i==dico_list[j]["score"] and dico_list[j]["name"] not in self.Liste_joueur:
-                    a=dico_list[j]["name"]
-                    self.Liste_joueur.append(a)
-                    b=dico_list[j]["score"]
-                    self.Liste_joueur.append(b)
-        return self.Liste_joueur
-    
-    """def trier_liste_score(self,dico_list):
-        self.Liste_score_joueur=[]
-        for i in range(0,len(dico_list)):
-            a=dico_list[i]["score"]
-            self.Liste_score_joueur.append(a)
-        self.Liste_score_joueur.sort()
-        print (self.Liste_score_joueur)
-
-    def classe_liste(self,dico_list,Liste_score_joueur):
-        self.Liste_joueur=[]
+        Liste_joueur=[]
         for i in Liste_score_joueur:
             for j in range(0,len(dico_list)):
-                if i==dico_list[j]["score"] and dico_list[j]["name"] not in self.Liste_joueur:
+                if i==dico_list[j]["score"] and dico_list[j]["name"] not in Liste_joueur:
                     a=dico_list[j]["name"]
-                    self.Liste_joueur.append(a)
+                    Liste_joueur.append(a)
                     b=dico_list[j]["score"]
-                    self.Liste_joueur.append(b)
-        print(self.Liste_joueur)
-    """
+                    Liste_joueur.append(b)
+        return Liste_joueur
 
 # get command line argument of client, port
 if len(sys.argv) != 2:
