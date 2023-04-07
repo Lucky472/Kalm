@@ -28,6 +28,7 @@ WIDTHFRAME = BOARD_X_LENGTH
 HEIGHTFRAME = BOARD_Y_LENGTH//4
 X_OFFSET = 10
 Y_OFFSET = 10
+SPACING = 4
 
 
 HOST, PORT = "localhost", "31425"
@@ -425,7 +426,7 @@ class Menu :
         self.local_server = None
         self.has_defier = False
         self.Window.mainloop()
-        self.dico_list = [{["name"]:"matteo",["score"]:0}, {["name"]:"matte",["score"]:1}]
+        self.dico_list = [{"name":"matteo","score":0}, {"name":"matte","score":1}]
         
     def open_window(self):
         self.enregistrer_pseudo()
@@ -512,9 +513,5 @@ for x in range(1,X_AXIS_LENGTH):
 """
 
 menu = Menu()
-view = View()
-
-view.show_plays([(1,1),(2,2),(3,3)])
-window.mainloop()
 
 
