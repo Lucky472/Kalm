@@ -90,6 +90,22 @@ class Client(ConnectionListener):
     def Network_moved_pawn(self,data):
         self.window.controller.controller_move_pawn(self.window.controller.opponent_pawn, data["location"])
         self.window.controller.set_active()
+        
+    def Network_challenge(self,data):
+        if self.window.controller.ask_challenge(data["opponent"]):
+            self.Send({"action":"challenge_accepted","opponent":data["opponent"]})
+        else :
+            self.Send({"action":"challenge_denied","opponent":data["opponent"]})
+    
+    def Network_launch_game(self,data):
+        self.window.controller.launch_game
+    
+    def Network_cannot_challenge(self,data):
+        """
+        indique au joueur que il ne peut pas défier le joueur
+        (data["opponent"]) est le joueur ne pouvant pas être défié
+        """
+        pass
 #########################################################
 
 class ClientWindow(Tk):
@@ -164,7 +180,6 @@ class Controller:
                     if (pixel_y >= y_minus) and (pixel_x <= y_maxus):
                         return (x,y)
         return None
-    
     
     def send_placed_wall(self,location,orientation):
         self.client.Send({"action":"send_to_opponent", "sent_action":"placed_wall", "location":location, "orientation":orientation})
@@ -475,7 +490,15 @@ class Menu :
         self.local_server = None
         self.has_defier = False
         self.Window.mainloop()
-        
+    
+    def ask_challenge(self,opponent):
+        """
+        opponent est l'élément de dico avec tt les attributs du challenger
+        demande au joueur si il accepte le défi 
+        (si oui, return True
+         si non, return False)
+        """    
+    
     def open_window(self):
         self.enregistrer_pseudo()
         self.enregistrer_port()
