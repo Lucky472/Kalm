@@ -17,6 +17,8 @@ RADIUSPAWN = 17
 RADIUSDOTS = 5
 COLORDOT = "#EEEEEE"
 COLORBOARD = "#454545"
+BACKGROUNDCOLOR = '#41B77F'
+FONT = 'arial'
 WIDTHWALL = 10
 WIDTHLINE = 4
 COLORLINE = "#D4D4D4"
@@ -122,7 +124,66 @@ class Client(ConnectionListener):
 class ClientWindow(Tk):
     def __init__(self, host, port,color,nickname):
         Tk.__init__(self)
+        self.geometry("520x500")
+        self.configure(bg=BACKGROUNDCOLOR)
         self.client = Client(host, int(port), self,color,nickname)
+        self.dico_list=[{"name":"matteo","score":2},{"name":"killian","score":13},{"name":"adrien","score":12},{"name":"lucas","score":4}]
+        self.text_tournament()
+        self.pack_tournament()
+        self.afficher_liste_joueur(self.trier_liste(self.dico_list))
+
+
+    def pack_tournament(self):
+        self.frame.pack()
+        self.f_affichage_liste.pack()
+        self.f_liste.pack()
+        self.L_adversaire.pack()
+        self.e_adversaire.pack()
+        self.f_adversaire.pack()
+        self.B_jouer.pack(side=BOTTOM)
+    
+    def text_tournament(self):
+        self.frame=Frame(self,bg=BACKGROUNDCOLOR)
+        self.f_affichage_liste=Frame(self,bg=BACKGROUNDCOLOR)
+        self.Label_liste=Label(self.f_affichage_liste,text='Classement joueurs',font=(FONT,10),bg=BACKGROUNDCOLOR,fg='white')
+        self.f_liste=Frame(self.f_affichage_liste,bg=BACKGROUNDCOLOR)
+        self.f_adversaire=Frame(self.frame,bg=BACKGROUNDCOLOR)
+        self.L_adversaire=Label(self.frame,text='choisis ton adversaire',font=(FONT,19),bg=BACKGROUNDCOLOR,fg='white')
+        self.e_adversaire=Entry(self.f_adversaire,font=(FONT,20),bg=BACKGROUNDCOLOR,fg='white')
+        self.B_jouer = Button(self,text='   Défier   ',command=self.defy_tournament ,bg='#4065A4')
+        
+    def afficher_liste_joueur(self,Liste_joueur):
+        for i in range(len(Liste_joueur)-2,-1,-2):
+            self.L_joueur=Label(self.f_liste,text=Liste_joueur[i]+" "+ str(Liste_joueur[i+1]),font=(FONT,10),bg='#4065A4',fg='black',bd=2,relief=SUNKEN)
+            self.L_joueur.pack(pady=2)
+    
+    def trier_liste(self,dico_list):
+        """
+            Prend le dico_list et le trie pour qu'il soit affichable
+        """
+        Liste_score_joueur=[]
+        for i in range(0,len(dico_list)):
+            a=dico_list[i]["score"]
+            Liste_score_joueur.append(a)
+        Liste_score_joueur.sort()
+
+        Liste_joueur=[]
+        for i in Liste_score_joueur:
+            for j in range(0,len(dico_list)):
+                if i==dico_list[j]["score"] and dico_list[j]["name"] not in Liste_joueur:
+                    a=dico_list[j]["name"]
+                    Liste_joueur.append(a)
+                    b=dico_list[j]["score"]
+                    Liste_joueur.append(b)
+        return Liste_joueur
+
+    def defy_tournament(self):
+        opponent = self.e_adversaire.get()
+        if len(opponent) == 0:
+            boxedmessage.showinfo(title=None, message="ON NE PEUT PAS DEFIER LE VIDE GROS MALIN")
+        else:
+            self.send_challenge(opponent)
+
 
     def myMainLoop(self):
         while self.client.state!=DEAD:   
@@ -491,28 +552,18 @@ class Buttons :
         self.packall()
 
     def frame(self):
-        self.frame=Frame(self.menu.Window,bg='#41B77F')
-        self.f_affichage_liste=Frame(self.menu.Window,bg='#41B77F')
-        self.f_liste=Frame(self.f_affichage_liste,bg='#41B77F')
-        self.f_adversaire=Frame(self.frame,bg='#41B77F')
-        self.f_pseudo= Frame(self.frame,bg='#41B77F')
-        self.f_host = Frame(self.frame,bg='#41B77F')
-        self.f_port = Frame(self.frame,bg='#41B77F')
+        self.frame=Frame(self.menu.Window,bg=BACKGROUNDCOLOR)
+        self.f_pseudo= Frame(self.frame,bg=BACKGROUNDCOLOR)
+        self.f_host = Frame(self.frame,bg=BACKGROUNDCOLOR)
+        self.f_port = Frame(self.frame,bg=BACKGROUNDCOLOR)
         
         
     def text(self):
-        self.Label_liste=Label(self.f_affichage_liste,text='Classement joueurs',font=('arial',10),bg='#41B77F',fg='white')
-        self.Labeltitle1=Label(self.frame,text='Menu du jeu quoridor',font=("arial",30),bg='#41B77F',fg='white')
-        self.Labeltitle2=Label(self.frame,text='Preparez vous à jouer, regarder les règles et choississez votre couleur',font=("arial",10),bg='#41B77F',fg='white')
-        self.L_pseudo=Label(self.frame,text='choisi ton pseudo',font=("arial",19),bg='#41B77F',fg='white')
-        self.L_host=Label(self.frame,text='host',font=("arial",19),bg='#41B77F',fg='white')
-        self.L_port = Label(self.frame,text='port',font=("arial",19),bg='#41B77F',fg='white')
-        self.L_adversaire=Label(self.frame,text='choisis ton adversaire',font=("arial",19),bg='#41B77F',fg='white')
-
-    def afficher_liste_joueur(self,Liste_joueur):
-        for i in range(len(Liste_joueur)-2,-1,-2):
-            self.L_joueur=Label(self.f_liste,text=Liste_joueur[i]+" "+ str(Liste_joueur[i+1]),font=("arial",10),bg='#4065A4',fg='black',bd=2,relief=SUNKEN)
-            self.L_joueur.pack(pady=2)
+        self.Labeltitle1=Label(self.frame,text='Menu du jeu quoridor',font=(FONT,30),bg=BACKGROUNDCOLOR,fg='white')
+        self.Labeltitle2=Label(self.frame,text='Preparez vous à jouer, regarder les règles et choississez votre couleur',font=(FONT,10),bg='#41B77F',fg='white')
+        self.L_pseudo=Label(self.frame,text='choisi ton pseudo',font=(FONT,19),bg=BACKGROUNDCOLOR,fg='white')
+        self.L_host=Label(self.frame,text='host',font=(FONT,19),bg=BACKGROUNDCOLOR,fg='white')
+        self.L_port = Label(self.frame,text='port',font=(FONT,19),bg=BACKGROUNDCOLOR,fg='white')
 
     def buttons(self):
         self.B_quitter=Button(self.menu.Window,text='quitter',command=self.menu.Window.destroy,bg='#ed1111')
@@ -520,10 +571,9 @@ class Buttons :
         self.B_jouer = Button(self.menu.Window,text='   Jouer   ',command= self.menu.open_window,bg='#4065A4')
 
     def entries(self):
-        self.e_pseudo=Entry(self.f_pseudo,font=("arial",20),bg='#41B77F',fg='white')
-        self.e_host = Entry(self.f_host,font=("arial",20),bg='#41B77F',fg='white')
-        self.e_port = Entry(self.f_port,font=("arial",20),bg='#41B77F',fg='white')
-        self.e_adversaire=Entry(self.f_adversaire,font=("arial",20),bg='#41B77F',fg='white')
+        self.e_pseudo=Entry(self.f_pseudo,font=(FONT,20),bg=BACKGROUNDCOLOR,fg='white')
+        self.e_host = Entry(self.f_host,font=(FONT,20),bg=BACKGROUNDCOLOR,fg='white')
+        self.e_port = Entry(self.f_port,font=(FONT,20),bg=BACKGROUNDCOLOR,fg='white')
         self.e_pseudo.insert(0,NICKNAME)
         self.e_host.insert(0,HOST)
         self.e_port.insert(0,PORT)
@@ -531,8 +581,6 @@ class Buttons :
 
     def packall (self):
         self.frame.pack(expand=YES)
-        self.f_affichage_liste.pack()
-        self.f_liste.pack(side=RIGHT)
         self.Labeltitle1.pack()
         self.B_quitter.pack(side=LEFT)
         self.Labeltitle2.pack()
@@ -546,9 +594,6 @@ class Buttons :
         self.L_port.pack()
         self.e_port.pack()
         self.f_port.pack()
-        self.L_adversaire.pack()
-        self.e_adversaire.pack()
-        self.f_adversaire.pack()
         self.B_jouer.pack(side=BOTTOM)
         
 
@@ -557,31 +602,30 @@ class Menu :
         self.Window=Tk()
         self.Window.geometry("520x500")
         self.Window.title("menu principal du jeu")
-        self.Window.config(background='#41B77F')
-        self.dico_list=[{"name":"matteo","score":2},{"name":"killian","score":13},{"name":"adrien","score":12},{"name":"lucas","score":4}]
+        self.Window.config(background=BACKGROUNDCOLOR)
         self.buttons = Buttons(self)
         self.color = BASECOLOR
         self.local_server = None
         self.has_defier = False
         # sert juste pour visualiser, actualise_list sera appelé par le serveur à chaque fois
-        self.actualise_list(self.dico_list)
         self.Window.mainloop()  
     
     def open_window(self):
         self.enregistrer_pseudo()
         self.enregistrer_port()
         self.enregistrer_host()
-        self.enregistrer_adversaire()
-        
-        if self.nickname != NICKNAME :
+
+        if len(self.nickname) >= 22:
+            boxedmessage.showinfo(title=None, message="TON PSEUDO EST TROP LONG!")
+
+        if (self.nickname != NICKNAME) or (len(self.nickname)==0):
             self.client_window = ClientWindow(self.host, self.port, self.color, self.nickname)
             self.client_window.myMainLoop()
             
         else :
-            boxedmessage.showinfo(title=None, message="Change ton pseudo !") 
+            boxedmessage.showinfo(title=None, message="CHANGE TON PSEUDO ! ET NE MET PAS LE VIDE !") 
 
-        if len(self.nickname) >= 22:
-            boxedmessage.showinfo(title=None, message="Ton pseudo est trop long !") 
+ 
     
     def change_color(self):
         colors=askcolor(title="Tkinter Color Chooser")
@@ -597,33 +641,6 @@ class Menu :
         
     def enregistrer_port(self):
         self.port=self.buttons.e_port.get()
-
-    def enregistrer_adversaire(self):
-        self.adversaire=self.buttons.e_adversaire.get()
-    
-    def actualise_list(self,dico_list):
-         #avant ça il faut supprimer l'ancienne liste affichée
-         self.buttons.afficher_liste_joueur(self.trier_liste(dico_list))       
-
-    def trier_liste(self,dico_list):
-        """
-            Prend le dico_list et le trie pour qu'il soit affichable dans buttons
-        """
-        Liste_score_joueur=[]
-        for i in range(0,len(dico_list)):
-            a=dico_list[i]["score"]
-            Liste_score_joueur.append(a)
-        Liste_score_joueur.sort()
-
-        Liste_joueur=[]
-        for i in Liste_score_joueur:
-            for j in range(0,len(dico_list)):
-                if i==dico_list[j]["score"] and dico_list[j]["name"] not in Liste_joueur:
-                    a=dico_list[j]["name"]
-                    Liste_joueur.append(a)
-                    b=dico_list[j]["score"]
-                    Liste_joueur.append(b)
-        return Liste_joueur
 
 # get command line argument of client, port
 if len(sys.argv) != 2:
