@@ -205,6 +205,17 @@ class Controller:
                     if (pixel_y >= y_minus) and (pixel_x <= y_maxus):
                         return (x,y)
         return None
+
+    def detect_clicked_square(self,pixel_x,pixel_y):
+        for x in range(0,X_AXIS_LENGTH):
+            x_minus = x*SIZESQUARE + X_OFFSET + WIDTHLINE
+            x_maxus = (x+1)*SIZESQUARE + X_OFFSET - WIDTHLINE
+            for y in range(0,Y_AXIS_LENGTH):
+                y_minus = y*SIZESQUARE + Y_OFFSET + WIDTHLINE
+                y_maxus = (y+1)*SIZESQUARE + Y_OFFSET - WIDTHLINE
+                if (pixel_x >= x_minus) and (pixel_x <= x_maxus):
+                    if (pixel_y >= y_minus) and (pixel_y <= y_maxus):
+                        return (x,y)
     
     def send_placed_wall(self,location,orientation):
         self.client.Send({"action":"send_to_opponent", "sent_action":"placed_wall", "location":location, "orientation":orientation})

@@ -136,6 +136,7 @@ class View:
     def __init__(self,window,color,oponent_color):
         self.window = window
         self.canvas_board = Canvas(self.window,height = PIXEL_BOARD_Y_LENGTH + 2*Y_OFFSET,width =  PIXEL_BOARD_X_LENGTH + 2*X_OFFSET,bg =COLORBOARD )
+        self.canvas_board.bind("<Button-1>",self.detect_clicked_square)
         self.draw_board()
 
         self.canvas_board.pack()
@@ -168,8 +169,23 @@ class View:
                 x1 = (x+1)*SIZESQUARE - LENGTH_LINE + X_OFFSET +1
                 self.canvas_board.create_line(x0,y01,x1,y01,fill = COLORLINE,width=WIDTHLINE)
 
-
-
+#PAS CENSE ÊTRE LA, mais pour tester la fonction
+    def detect_clicked_square(self,evt):
+        print("clic")
+        pixel_x = evt.x
+        pixel_y = evt.y
+        for x in range(0,X_AXIS_LENGTH):
+            x_minus = x*SIZESQUARE + X_OFFSET + WIDTHLINE
+            x_maxus = (x+1)*SIZESQUARE + X_OFFSET - WIDTHLINE
+            for y in range(0,Y_AXIS_LENGTH):
+                y_minus = y*SIZESQUARE + Y_OFFSET + WIDTHLINE
+                y_maxus = (y+1)*SIZESQUARE + Y_OFFSET - WIDTHLINE
+                #self.canvas_board.create_rectangle(x_minus,y_minus,x_maxus,y_maxus,fill = "#000000")
+                if (pixel_x >= x_minus) and (pixel_x <= x_maxus):
+                    if (pixel_y >= y_minus) and (pixel_y <= y_maxus):
+                        self.canvas_board.create_rectangle(x_minus,y_minus,x_maxus,y_maxus,fill = "#000000")
+                        print(x,y)
+                        return (x,y)
         
     def draw_pawn(self,x,y,color):
         x0,y0 = self.get_center(x,y)
@@ -219,8 +235,8 @@ class View:
             self.deletable_dots.append(self.canvas_board.create_oval(x0 - RADIUSDOTS,y0-RADIUSDOTS,x0 + RADIUSDOTS,y0 + RADIUSDOTS,fill = COLORDOT))
 
     def delete_deletable_dots(self):
-        for x in self.deletable_dots:
-            self.canvas_board.delete(x)
+        for i in range(0,len(self.deletable_dots)):
+            self.canvas_board.delete(self.deletable_dots.pop(0))
             
 
 class Model :
@@ -384,5 +400,6 @@ for x in range(1,X_AXIS_LENGTH):
 """
 
 window = Tk()
-controller = Controller(window)
+#controller = Controller(window)
+view = View(window,"#AA5325","#E52627")
 window.mainloop()
