@@ -197,9 +197,10 @@ class ClientWindow(Tk):
         self.controller = None
 
     def pack_tournament(self):
-        self.frame.pack()
-        self.f_affichage_liste.pack()
-        self.f_liste.pack()
+        self.frame.pack(pady=20)
+        self.f_affichage_liste.pack(expand=YES)
+        self.Label_liste.pack()
+        self.f_liste.pack(expand=YES,pady=30,pady=80)
         self.L_adversaire.pack()
         self.e_adversaire.pack()
         self.f_adversaire.pack()
@@ -207,18 +208,18 @@ class ClientWindow(Tk):
     
     def text_tournament(self):
         self.frame=Frame(self,bg=BACKGROUNDCOLOR)
-        self.f_affichage_liste=Frame(self,bg=BACKGROUNDCOLOR)
-        self.Label_liste=Label(self.f_affichage_liste,text='Classement joueurs',font=(FONT,10),bg=BACKGROUNDCOLOR,fg='white')
-        self.f_liste=Frame(self.f_affichage_liste,bg=BACKGROUNDCOLOR)
+        self.f_affichage_liste=Frame(self,bg='white',bd=2,relief=SUNKEN)
+        self.Label_liste=Label(self.f_affichage_liste,text='Classement joueurs',font=(FONT,10),bg='white,fg='black')
+        self.f_liste=Frame(self.f_affichage_liste,bg='white')
         self.f_adversaire=Frame(self.frame,bg=BACKGROUNDCOLOR)
         self.L_adversaire=Label(self.frame,text='Choisis ton adversaire',font=(FONT,19),bg=BACKGROUNDCOLOR,fg='white')
-        self.e_adversaire=Entry(self.f_adversaire,font=(FONT,20),bg=BACKGROUNDCOLOR,fg='white')
+        self.e_adversaire=Entry(self.f_adversaire,font=(FONT,20),bg='white',fg='black')
         self.B_jouer = Button(self,text='   Défier   ',command=self.defy_tournament ,bg='#4065A4')
     
     def afficher_liste_joueur(self,Liste_joueur):
         for i in range(len(Liste_joueur)-2,-1,-2):
             self.L_joueur=Label(self.f_liste,text=Liste_joueur[i]+" "+ str(Liste_joueur[i+1]),font=(FONT,10),bg='#4065A4',fg='black',bd=2,relief=SUNKEN)
-            self.L_joueur.pack(pady=2)
+            self.L_joueur.pack(pady=0,fill=X)
     
     def defy_tournament(self):
         opponent = self.e_adversaire.get()
@@ -654,9 +655,9 @@ class Buttons :
         self.B_jouer = Button(self.menu.Window,text='   Jouer   ',command= self.menu.open_window,bg='#4065A4')
 
     def entries(self):
-        self.e_pseudo=Entry(self.f_pseudo,font=(FONT,20),bg=BACKGROUNDCOLOR,fg='white')
-        self.e_host = Entry(self.f_host,font=(FONT,20),bg=BACKGROUNDCOLOR,fg='white')
-        self.e_port = Entry(self.f_port,font=(FONT,20),bg=BACKGROUNDCOLOR,fg='white')
+        self.e_pseudo=Entry(self.f_pseudo,font=(FONT,20),bg='white',fg='black')
+        self.e_host = Entry(self.f_host,font=(FONT,20),bg='white',fg='black')
+        self.e_port = Entry(self.f_port,font=(FONT,20),bg='white',fg='black')
         self.e_pseudo.insert(0,NICKNAME)
         self.e_host.insert(0,HOST)
         self.e_port.insert(0,PORT)
