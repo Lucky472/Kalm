@@ -618,7 +618,10 @@ class Menu :
             self.client_window.myMainLoop()
             
         else :
-            boxedmessage.showinfo(title=None, message="please change your nickname") 
+            boxedmessage.showinfo(title=None, message="Change ton pseudo !") 
+
+        if len(self.nickname) >= 22:
+            boxedmessage.showinfo(title=None, message="Ton pseudo est trop long !") 
     
     def change_color(self):
         colors=askcolor(title="Tkinter Color Chooser")
