@@ -121,12 +121,18 @@ class Client(ConnectionListener):
     
     def Network_challenge_denied(self,data):
         self.window.challenge_denied(data["opponent"])
+        
+    def Network_close_game(self):
+        self.window.show_tournament()
+        
+        
 #########################################################
 
 class ClientWindow(Tk):
     def __init__(self, host, port,color,nickname):
         Tk.__init__(self)
         self.client = Client(host, int(port), self,color,nickname)
+        self.controller = None
 
     def myMainLoop(self):
         while self.client.state!=DEAD:   
@@ -144,7 +150,7 @@ class ClientWindow(Tk):
     def ask_challenge(self,opponent):
         """
         opponent est l'instance de classe avec tt les attributs du challenger
-        demande au joueur si il accepte le défi 
+        demande au joueur si il accepte le défi lancé par un joueur tiers
         (si oui, return True
          si non, return False)
         """  
@@ -195,7 +201,6 @@ class Controller:
                     if self.model.test_add_wall((hole[0],hole[1]),"UP"):
                         self.controller_place_wall((hole[0],hole[1]),"UP")
                         self.send_placed_wall((hole[0],hole[1]),"UP")
-
             if (self.move == PLACE_WALL_ACROSS): 
                 hole = self.detect_clicked_hole(evt.x,evt.y)
                 if (hole != None):
@@ -233,10 +238,13 @@ class Controller:
         return False
     
     def send_i_lost(self):
-        pass
+        self.client.Send({"action":"i_lost"})
         
     def send_i_won(self):
-        pass
+        self.client.Send({"action":"i_won"})
+    
+    def test_end_game(self):
+        return (self.model.pawns["UP"].coords[1] == 0) or (self.model.pawns["DOWN"].coords[1] == Y_AXIS_LENGTH-1)
     
     def controller_place_wall(self,location,orientation):
         x,y = location

@@ -5,6 +5,13 @@ from PodSixNet.Server import Server
 from PodSixNet.Channel import Channel
 
 BASE_SCORE = 1000
+WON = 1
+LOST = -1
+
+IN_LOBBY = 0
+IN_GAME = 1
+IN_CHALLENGE = 2
+
 
 class ClientChannel(Channel):
     """
@@ -19,10 +26,11 @@ class ClientChannel(Channel):
         self.nickname = data["nickname"]
         self.color = data["color"]
         self.score = BASE_SCORE
+        self.state = IN_LOBBY
         self._server.am_i_allowed(self,self.nickname)
     
     def Network_send_to_opponent(self,data):
-        data["who"] = self.opponent
+        data["who"] = self.opponent.nickname
         data["action"] = data["sent_action"]
         new_data = {key:data[key] for key in data if key != "sent_action"}
         self.SendTo(new_data)
@@ -47,6 +55,12 @@ class ClientChannel(Channel):
     
     def Network_challenge_denied(self,data):
         self._server.challenge_denied(self,data["opponent"])
+
+    def Network_i_won(self):
+        self._server.game_ended(self, WON, self.opponent)
+
+    def Network_i_lost(self):
+        self._server.game_ended(self, LOST, self.opponent)
 
 class MyServer(Server):
     channelClass = ClientChannel
@@ -91,16 +105,21 @@ class MyServer(Server):
             sleep(0.001)
 
     def challenge_request(self,challenger,player2_nick):
+        challenger.state = IN_CHALLENGE
         player2 = self.get_player(player2_nick)
         if self.can_challenge(challenger,player2):
             if self.is_forced_challenge(challenger,player2) :
                 self.launch_game(challenger,player2)
             else :
                 player2.Send({"action":"challenge","opponent":challenger})
+                player2.state = IN_CHALLENGE
         else :
             challenger.Send({"action":"cannot_challenge","opponent":player2})
     
     def can_challenge(self,challenger,player2):
+        """
+        prends en compte: l'écart de points ET le fait qu'il soit en game
+        """
         return True
     
     def is_forced_challenge(self,challenger,player2):
@@ -108,16 +127,34 @@ class MyServer(Server):
     
     def launch_game(self,challenger_nick,player2):
         challenger = self.get_player(challenger_nick)
-        player2.opponent = challenger.nickname
-        challenger.opponent = player2.nickname
+        player2.opponent = challenger
+        challenger.opponent = player2
         player2.Send({"action":"launch_game","your_pawn":"UP","opponent_pawn":"DOWN","your_color":player2.color,"opponent_color":challenger.color})
         challenger.Send({"action":"launch_game","your_pawn":"DOWN","opponent_pawn":"UP","your_color":challenger.color,"opponent_color":player2.color})
-
+        player2.state = IN_GAME
+        challenger.state = IN_GAME
+        
     def challenge_denied(self,challenged,challenger):
         challenger.Send({"action":"challenge_denied","opponent":challenged})
+        challenger.state = IN_LOBBY
+        challenged.state = IN_LOBBY
 
     def get_player(self,nick):
         return [p for p in self.players if p.nickname == nick][0]
+
+    def game_ended(self,player,result,opponent):
+        self.set_new_score(player,result,opponent)
+        player.state = IN_LOBBY
+        player.Send({"action":"close_game"})
+        
+    def set_new_score(self,player,result,opponent):
+        old_score = player.score
+        opponent_score= opponent.score
+        if result == WON :
+            player.score = 3141592
+        else :
+            player.score = 3141592
+
 
 
 # get command line argument of server, port
