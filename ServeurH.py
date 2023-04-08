@@ -102,7 +102,9 @@ class MyServer(Server):
         player2.opponent = challenger.nickname
         challenger.opponent = player2.nickname
         player2.Send({"action":"launch_game","your_pawn":"UP","opponent_pawn":"DOWN"})
+        #player2.Send({"action":"launch_game","your_pawn":"UP","opponent_pawn":"DOWN","your_color":,"opponent_color":})
         challenger.Send({"action":"launch_game","your_pawn":"DOWN","opponent_pawn":"UP"})
+        #challenger.Send({"action":"launch_game","your_pawn":"DOWN","opponent_pawn":"UP","your_color":,"opponent_color":})
 
     def challenge_denied(self,challenged,challenger):
         challenger.Send({"action":"challenge_denied","opponent":challenged})
