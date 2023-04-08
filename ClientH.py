@@ -461,7 +461,8 @@ class Buttons :
 
     def frame(self):
         self.frame=Frame(self.menu.Window,bg='#41B77F')
-        self.f_liste=Frame(self.frame,bg='#41B77F')
+        self.f_affichage_liste=Frame(self.menu.Window,bg='#41B77F')
+        self.f_liste=Frame(self.f_affichage_liste,bg='#41B77F')
         self.f_adversaire=Frame(self.frame,bg='#41B77F')
         self.f_pseudo= Frame(self.frame,bg='#41B77F')
         self.f_host = Frame(self.frame,bg='#41B77F')
@@ -469,6 +470,7 @@ class Buttons :
         
         
     def text(self):
+        self.Label_liste=Label(self.f_affichage_liste,text='Classement joueurs',font=('arial',10),bg='#41B77F',fg='white')
         self.Labeltitle1=Label(self.frame,text='Menu du jeu quoridor',font=("arial",30),bg='#41B77F',fg='white')
         self.Labeltitle2=Label(self.frame,text='Preparez vous à jouer, regarder les règles et choississez votre couleur',font=("arial",10),bg='#41B77F',fg='white')
         self.L_pseudo=Label(self.frame,text='choisi ton pseudo',font=("arial",19),bg='#41B77F',fg='white')
@@ -498,6 +500,7 @@ class Buttons :
 
     def packall (self):
         self.frame.pack(expand=YES)
+        self.f_affichage_liste.pack()
         self.f_liste.pack(side=RIGHT)
         self.Labeltitle1.pack()
         self.B_quitter.pack(side=LEFT)
