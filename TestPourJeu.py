@@ -109,14 +109,7 @@ class Controller:
         self.view.canvas_board.bind("<Button-1>",self.board_click)
         self.move = MOVE_PAWN
         self.state = INITIAL
-    
-    def frame_buttons(self,window):
-        self.f_buttons = Frame(self.window, width = WIDTHFRAME, height = HEIGHTFRAME).pack(side=BOTTOM)
-    
-    def buttons(self):
-       self.B_move = Button(self.f_buttons, text = "Se déplacer", command = self.controller.set_move_pawn()).pack(side=LEFT)
-       self.B_horizontal_wall = Button(self.f_buttons, text = "Mur horizontal", command = self.controller.set_wall_horisontal()).pack(side=LEFT, padx=PIXEL_BOARD_X_LENGTH//3)
-       self.B_vertical_wall = Button(self.f_buttons, text = "Mur vertical", command = self.controller.set_wall_vertical()).pack(side=LEFT)
+        
     
     def board_click(self):
         if self.state == ACTIVE :
@@ -138,6 +131,7 @@ class View:
         self.canvas_board = Canvas(self.window,height = PIXEL_BOARD_Y_LENGTH + 2*Y_OFFSET,width =  PIXEL_BOARD_X_LENGTH + 2*X_OFFSET,bg =COLORBOARD )
         self.canvas_board.bind("<Button-1>",self.detect_clicked_square)
         self.draw_board()
+        self.controller = Controller
 
         self.canvas_board.pack()
         # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6)
@@ -151,6 +145,24 @@ class View:
         self.pawns = {"DOWN":self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1,self.color),"UP":self.draw_pawn(X_AXIS_LENGTH // 2, 0,self.oponent_color)}
         #Pour gérer la couleur faudra savoir la couleur du bas et celle du haut
         self.deletable_dots = []
+        self.frame_buttons(window)
+        self.buttons()
+        self.pack_buttons()
+        
+        
+    def frame_buttons(self,window):
+        self.f_buttons = Frame(window, width = WIDTHFRAME, height = HEIGHTFRAME)
+    
+    def buttons(self):
+       self.B_move = Button(self.f_buttons, text = "Se déplacer", command = self.controller.set_move_pawn(self))
+       self.B_horizontal_wall = Button(self.f_buttons, text = "Mur horizontal", command = self.controller.set_wall_horisontal(self))
+       self.B_vertical_wall = Button(self.f_buttons, text = "Mur vertical", command = self.controller.set_wall_vertical(self))
+    
+    def pack_buttons(self):
+        self.f_buttons.pack(side=BOTTOM)
+        self.B_horizontal_wall.pack(side=LEFT)
+        self.B_move.pack(side=LEFT,padx = PIXEL_BOARD_X_LENGTH//3)
+        self.B_vertical_wall.pack(side=RIGHT)
         
 
     def draw_board(self):
