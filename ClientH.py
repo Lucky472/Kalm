@@ -200,7 +200,7 @@ class ClientWindow(Tk):
         self.frame.pack(pady=20)
         self.f_affichage_liste.pack(expand=YES)
         self.Label_liste.pack()
-        self.f_liste.pack(expand=YES,pady=30,pady=80)
+        self.f_liste.pack(expand=YES,pady=30,padx=80)
         self.L_adversaire.pack()
         self.e_adversaire.pack()
         self.f_adversaire.pack()
