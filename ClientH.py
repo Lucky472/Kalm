@@ -43,6 +43,10 @@ MOVE_PAWN = 0
 PLACE_WALL_UP = 1
 PLACE_WALL_ACROSS = 2
 
+ME = 0
+OPPONENT = 1
+
+
 class Client(ConnectionListener):
     def __init__(self, host, port, window,color,nickname):
         self.window = window
@@ -119,6 +123,11 @@ class Client(ConnectionListener):
     
     def Network_challenge_denied(self,data):
         self.window.challenge_denied(data["opponent"])
+        
+    def Network_close_game(self):
+        self.window.show_tournament()
+        
+        
 #########################################################
 
 class ClientWindow(Tk):
@@ -127,12 +136,11 @@ class ClientWindow(Tk):
         self.geometry("520x500")
         self.configure(bg=BACKGROUNDCOLOR)
         self.client = Client(host, int(port), self,color,nickname)
+        self.controller = None
         self.dico_list=[{"name":"matteo","score":2},{"name":"killian","score":13},{"name":"adrien","score":12},{"name":"lucas","score":4}]
         self.text_tournament()
         self.pack_tournament()
         self.afficher_liste_joueur(self.trier_liste(self.dico_list))
-
-
     def pack_tournament(self):
         self.frame.pack()
         self.f_affichage_liste.pack()
@@ -182,9 +190,8 @@ class ClientWindow(Tk):
         if len(opponent) == 0:
             boxedmessage.showinfo(title=None, message="ON NE PEUT PAS DEFIER LE VIDE GROS MALIN")
         else:
-            self.send_challenge(opponent)
-
-
+            self.send_challenge(opponent)  
+            
     def myMainLoop(self):
         while self.client.state!=DEAD:   
             self.update()
@@ -200,8 +207,8 @@ class ClientWindow(Tk):
 
     def ask_challenge(self,opponent):
         """
-        opponent est l'élément de dico avec tt les attributs du challenger
-        demande au joueur si il accepte le défi 
+        opponent est l'instance de classe avec tt les attributs du challenger
+        demande au joueur si il accepte le défi lancé par un joueur tiers
         (si oui, return True
          si non, return False)
         """  
@@ -214,7 +221,7 @@ class ClientWindow(Tk):
 
     def challenge_denied(opponent):
         """
-        opponent est l'élément de dico avec tt les attributs du challenger
+        opponent est l'instance de classe avec tt les attributs du challenger
         informe le joueur que le défi a été refusé
         """
         
@@ -252,7 +259,6 @@ class Controller:
                     if self.model.test_add_wall((hole[0],hole[1]),"UP"):
                         self.controller_place_wall((hole[0],hole[1]),"UP")
                         self.send_placed_wall((hole[0],hole[1]),"UP")
-
             if (self.move == PLACE_WALL_ACROSS): 
                 hole = self.detect_clicked_hole(evt.x,evt.y)
                 if (hole != None):
@@ -270,11 +276,33 @@ class Controller:
         x,y = location
         self.view.move_pawn(x, y, pawn)
         self.model.move_pawn(pawn, location)
-        self.test_end_game()
+        self.is_it_end_game()
         self.state = INACTIVE
         
+    def is_it_end_game(self):
+        if self.test_end_game() :
+            if self.did_i_won() :
+                self.send_i_won()
+                self.view.show_winner(ME)
+            else :
+                self.send_i_lost()
+                self.view.show_winner(OPPONENT)
+    
+    def did_i_won(self):
+        if self.my_pawn == "UP" and self.model.pawns["UP"].coords[1] == 0:
+            return True
+        if self.my_pawn == "DOWN" and self.model.pawns["DOWN"].coords[1] == Y_AXIS_LENGTH-1:
+            return True
+        return False
+    
+    def send_i_lost(self):
+        self.client.Send({"action":"i_lost"})
+        
+    def send_i_won(self):
+        self.client.Send({"action":"i_won"})
+    
     def test_end_game(self):
-        pass
+        return (self.model.pawns["UP"].coords[1] == 0) or (self.model.pawns["DOWN"].coords[1] == Y_AXIS_LENGTH-1)
     
     def controller_place_wall(self,location,orientation):
         x,y = location
@@ -335,7 +363,6 @@ class View:
             self.pawns = {opponent_pawn:self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1 , opponent_color),my_pawn:self.draw_pawn(X_AXIS_LENGTH // 2, 0,color)}
         else:
             self.pawns = {my_pawn:self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1 ,color),opponent_pawn:self.draw_pawn(X_AXIS_LENGTH // 2, 0,opponent_color)}
-        
         self.color = color 
         self.oponent_color = opponent_color
         self.deletable_dots = []
@@ -406,6 +433,16 @@ class View:
         x1 = (x+2)*SIZESQUARE +X_OFFSET -SPACING
         self.canvas_board.create_rectangle(x0,y0,x1,y1,fill = COLORWALL)
         
+    def show_winner(self,winner):
+        if winner == ME:
+            """
+            indique que j'ai gagné
+            """
+        else:
+            """
+            indique que j'ai perdu
+            """
+
 class Model :
     def __init__(self):
         self.board = self.new_board()
