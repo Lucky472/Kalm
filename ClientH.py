@@ -21,6 +21,8 @@ BACKGROUNDCOLOR = '#41B77F'
 FONT = 'arial'
 WIDTHWALL = 10
 WIDTHLINE = 4
+WIDTHFRAME = BOARD_X_LENGTH
+HEIGHTFRAME = BOARD_Y_LENGTH//4
 COLORLINE = "#D4D4D4"
 COLORWALL = "#AA5372"
 LENGTH_LINE = 10
@@ -119,7 +121,7 @@ class Client(ConnectionListener):
         indique au joueur que il ne peut pas défier le joueur
         (data["opponent"]) est le joueur ne pouvant pas être défié
         """
-        boxedmessage.showinfo(title=None, message="le joueur: "+str(data["opponent"]+" ne peut pas être défié"))
+        boxedmessage.showinfo(title=None, message="Le joueur: "+str(data["opponent"]+" ne peut pas être défié"))
     
     def Network_challenge_denied(self,data):
         self.window.challenge_denied(data["opponent"])
@@ -159,7 +161,7 @@ class ClientWindow(Tk):
         unpack tt le jeu si il existe puis génère et pack tt l'interface de tournoi
         """
         if self.controller != None:
-            #UNPACK LE JEU 
+            self.unpack_game()
             self.set_tournament()
         else:
             self.set_tournament
@@ -184,7 +186,7 @@ class ClientWindow(Tk):
         opponent est l'instance de classe avec tt les attributs du challenger
         informe le joueur que le défi a été refusé
         """
-        boxedmessage.showinfo(title=None, message="TU AS ETE REJETE")
+        boxedmessage.showinfo(title=None, message="TU AS ÉTÉ REJETÉ")
 
         
     def launch_game(self,my_pawn,opponent_pawn,my_color,opponent_color):
@@ -208,7 +210,7 @@ class ClientWindow(Tk):
         self.Label_liste=Label(self.f_affichage_liste,text='Classement joueurs',font=(FONT,10),bg=BACKGROUNDCOLOR,fg='white')
         self.f_liste=Frame(self.f_affichage_liste,bg=BACKGROUNDCOLOR)
         self.f_adversaire=Frame(self.frame,bg=BACKGROUNDCOLOR)
-        self.L_adversaire=Label(self.frame,text='choisis ton adversaire',font=(FONT,19),bg=BACKGROUNDCOLOR,fg='white')
+        self.L_adversaire=Label(self.frame,text='Choisis ton adversaire',font=(FONT,19),bg=BACKGROUNDCOLOR,fg='white')
         self.e_adversaire=Entry(self.f_adversaire,font=(FONT,20),bg=BACKGROUNDCOLOR,fg='white')
         self.B_jouer = Button(self,text='   Défier   ',command=self.defy_tournament ,bg='#4065A4')
     
@@ -220,7 +222,7 @@ class ClientWindow(Tk):
     def defy_tournament(self):
         opponent = self.e_adversaire.get()
         if len(opponent) == 0:
-            boxedmessage.showinfo(title=None, message="ON NE PEUT PAS DEFIER LE VIDE GROS MALIN")
+            boxedmessage.showinfo(title=None, message="ON NE PEUT PAS DÉFIER LE VIDE GROS MALIN")
         else:
             self.send_challenge(opponent)  
 
@@ -382,6 +384,23 @@ class View:
         self.color = color 
         self.oponent_color = opponent_color
         self.deletable_dots = []
+        self.frame_buttons(window)
+        self.buttons()
+        self.pack_buttons()
+        
+    def frame_buttons(self,window):
+        self.f_buttons = Frame(window, width = WIDTHFRAME, height = HEIGHTFRAME)
+    
+    def buttons(self):
+       self.B_move = Button(self.f_buttons, text = "Se déplacer", command = self.controller.set_move_pawn(self))
+       self.B_horizontal_wall = Button(self.f_buttons, text = "Mur horizontal", command = self.controller.set_wall_horisontal(self))
+       self.B_vertical_wall = Button(self.f_buttons, text = "Mur vertical", command = self.controller.set_wall_vertical(self))
+    
+    def pack_buttons(self):
+        self.f_buttons.pack(side=BOTTOM)
+        self.B_horizontal_wall.pack(side=LEFT)
+        self.B_move.pack(side=LEFT,padx = PIXEL_BOARD_X_LENGTH//3)
+        self.B_vertical_wall.pack(side=RIGHT)
 
     def draw_board(self):
         #Lignes verticales
@@ -454,10 +473,20 @@ class View:
             """
             indique que j'ai gagné
             """
+            boxedmessage.showinfo(title=None, message="BIEN JOUÉ TU ES LE MEILLEUR JOUEUR")
         else:
             """
             indique que j'ai perdu
             """
+            boxedmessage.showinfo(title=None, message="TU AS PERDU ... ")
+            
+    def unpack_all(self):
+        self.canvas_board.delete("all")
+        self.canvas_board.destroy()
+        self.f_buttons.destroy()
+        self.B_horizontal_wall.destroy()
+        self.B_move.destroy()
+        self.B_vertical_wall.destroy()
 
 class Model :
     def __init__(self):
@@ -613,13 +642,13 @@ class Buttons :
         
     def text(self):
         self.Labeltitle1=Label(self.frame,text='Menu du jeu quoridor',font=(FONT,30),bg=BACKGROUNDCOLOR,fg='white')
-        self.Labeltitle2=Label(self.frame,text='Preparez vous à jouer, regarder les règles et choississez votre couleur',font=(FONT,10),bg='#41B77F',fg='white')
-        self.L_pseudo=Label(self.frame,text='choisi ton pseudo',font=(FONT,19),bg=BACKGROUNDCOLOR,fg='white')
-        self.L_host=Label(self.frame,text='host',font=(FONT,19),bg=BACKGROUNDCOLOR,fg='white')
-        self.L_port = Label(self.frame,text='port',font=(FONT,19),bg=BACKGROUNDCOLOR,fg='white')
+        self.Labeltitle2=Label(self.frame,text='Préparez vous à jouer, regarder les règles et choississez votre couleur',font=(FONT,10),bg='#41B77F',fg='white')
+        self.L_pseudo=Label(self.frame,text='Choisis ton pseudo',font=(FONT,19),bg=BACKGROUNDCOLOR,fg='white')
+        self.L_host=Label(self.frame,text='Host',font=(FONT,19),bg=BACKGROUNDCOLOR,fg='white')
+        self.L_port = Label(self.frame,text='Port',font=(FONT,19),bg=BACKGROUNDCOLOR,fg='white')
 
     def buttons(self):
-        self.B_quitter=Button(self.menu.Window,text='quitter',command=self.menu.Window.destroy,bg='#ed1111')
+        self.B_quitter=Button(self.menu.Window,text='Quitter',command=self.menu.Window.destroy,bg='#ed1111')
         self.B_couleur=Button(self.frame,text='Selectionner une couleur',command=self.menu.change_color,bg='#4065A4')
         self.B_jouer = Button(self.menu.Window,text='   Jouer   ',command= self.menu.open_window,bg='#4065A4')
 

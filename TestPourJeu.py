@@ -249,7 +249,6 @@ class View:
     def delete_deletable_dots(self):
         for i in range(0,len(self.deletable_dots)):
             self.canvas_board.delete(self.deletable_dots.pop(0))
-            
 
 class Model :
     def __init__(self):
