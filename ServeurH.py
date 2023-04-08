@@ -120,10 +120,13 @@ class MyServer(Server):
         """
         prends en compte: l'écart de points ET le fait qu'il soit en game
         """
-        return True
-    
+        
+        return abs(challenger.score - player2.score) < 300
+            
+        
     def is_forced_challenge(self,challenger,player2):
-        return True
+        
+        return abs(challenger.score - player2.score) < 200
     
     def launch_game(self,challenger_nick,player2):
         challenger = self.get_player(challenger_nick)
@@ -151,9 +154,9 @@ class MyServer(Server):
         old_score = player.score
         opponent_score= opponent.score
         if result == WON :
-            player.score = 3141592
+            player.score = old_score + (100 - (1/3)*(old_score - opponent_score))
         else :
-            player.score = 3141592
+            player.score = old_score - (100 - (1/3)*(old_score - opponent_score))
 
 
 
