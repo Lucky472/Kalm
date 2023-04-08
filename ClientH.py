@@ -105,7 +105,7 @@ class Client(ConnectionListener):
         indique au joueur que il ne peut pas défier le joueur
         (data["opponent"]) est le joueur ne pouvant pas être défié
         """
-        pass
+        boxedmessage.showinfo(title=None, message="le joueur "+str(data["opponent"]+" ne peut pas être défié"))
     
     def Network_challenge_denied(self,data):
         self.window.challenge_denied(data["opponent"])
