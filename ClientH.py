@@ -56,11 +56,20 @@ class Client(ConnectionListener):
         """
         Envoie les nom et couleur de son joueur
         """
-        connection.Send({"action": "nickname", "nickname": self.nickname})
-        connection.Send({"action": "color" ,"color": self.color})
+        connection.Send({"action": "init_player", "nickname": self.nickname, "color": self.color})
 
     def Network_connected(self, data):
         print("You are now connected to the server")
+    
+    def Network_connexion_accepted(self):
+        self.window.show_tournament()
+    
+    def Network_connexion_denied(self):
+        #dit au jouerur que la connexion a été refusée pour cause de mauvais pseudo
+        sleep(2)
+        self.window.destroy()
+        self.state = DEAD
+        exit()
     
     def Loop(self):
         connection.Pump()
@@ -97,7 +106,7 @@ class Client(ConnectionListener):
             self.Send({"action":"challenge_denied","opponent":data["opponent"]})
     
     def Network_launch_game(self,data):
-        self.window.launch_game(data["your_pawn"],data["opponent_pawn"])
+        self.window.launch_game(data["your_pawn"],data["opponent_pawn"],data["your_color"],data["opponent_color"])
     
     def Network_cannot_challenge(self,data):
         """
@@ -122,6 +131,12 @@ class ClientWindow(Tk):
             sleep(0.001)
         exit()    
 
+    
+    def show_tournament(self):
+        """
+        unpack tt le jeu si il existe puis génère et pack tt l'interface de tournoi
+        """
+
     def ask_challenge(self,opponent):
         """
         opponent est l'élément de dico avec tt les attributs du challenger
@@ -142,12 +157,11 @@ class ClientWindow(Tk):
         informe le joueur que le challenge a été refusé
         """
         
-    def launch_game(self,my_pawn,opponent_pawn):
-        self.controller = Controller(self,self.client,my_pawn,opponent_pawn)
-        #LE CONTROLLEUR DOIT FOURNIR LA COULEUR DU JOUEUR PUIS LA COULEUR DE L'ADVERSAIRE
+    def launch_game(self,my_pawn,opponent_pawn,my_color,opponent_color):
+        self.controller = Controller(self,self.client,my_pawn,opponent_pawn,my_color,opponent_color)
 
 class Controller:
-    def __init__(self,window,client,my_pawn,opponent_pawn):
+    def __init__(self,window,client,my_pawn,opponent_pawn,my_color,opponent_color):
         self.window = window
         self.client = client
         self.model = Model()
@@ -548,7 +562,6 @@ class Menu :
         self.enregistrer_adversaire()
         
         if self.nickname != NICKNAME :
-            # va falloir mettre adversaire en argument
             self.client_window = ClientWindow(self.host, self.port, self.color, self.nickname)
             self.client_window.myMainLoop()
             

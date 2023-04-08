@@ -19,6 +19,7 @@ class ClientChannel(Channel):
         self.nickname = data["nickname"]
         self.color = data["color"]
         self.score = BASE_SCORE
+        self._server.am_i_allowed(self,self.nickname)
     
     def Network_send_to_opponent(self,data):
         data["who"] = self.opponent
@@ -40,9 +41,9 @@ class ClientChannel(Channel):
         self._server.challenge_request(self,opponent_nick)
 
     def Network_challenge_accepted(self,data):
-        challenged = [p for p in self.players if p.nickname == data["challenged"]][0]
+        challenged_nick = data["challenged"]
         opponent = data["opponent"]
-        self._server.launch_game(challenged,opponent)
+        self._server.launch_game(challenged_nick,opponent)
     
     def Network_challenge_denied(self,data):
         self._server.challenge_denied(self,data)
@@ -59,8 +60,15 @@ class MyServer(Server):
     
     def AddPlayer(self, player):
         print("New Player connected")
-        self.players[player] = True
+        #self.players[player] = True
+        player.Send({"action": "initplayer"})
     
+    def am_i_allowed(self,player,nickname):
+        if nickname not in self.players:
+            player.Send({"action":"connexion_accepted"})
+            self.players[player] = True
+        else :
+            player.Send({"action":"connexion_denied"})
     def PrintPlayers(self):
         print("players' nicknames :",[p.nickname for p in self.players])
   
@@ -83,7 +91,7 @@ class MyServer(Server):
             sleep(0.001)
 
     def challenge_request(self,challenger,player2_nick):
-        player2 = [p for p in self.players if p.nickname == player2_nick][0]
+        player2 = self.get_player(player2_nick)
         if self.can_challenge(challenger,player2):
             if self.is_forced_challenge(challenger,player2) :
                 self.launch_game(challenger,player2)
@@ -98,16 +106,18 @@ class MyServer(Server):
     def is_forced_challenge(self,challenger,player2):
         return True
     
-    def launch_game(self,challenger,player2):
+    def launch_game(self,challenger_nick,player2):
+        challenger = self.get_player(challenger_nick)
         player2.opponent = challenger.nickname
         challenger.opponent = player2.nickname
-        player2.Send({"action":"launch_game","your_pawn":"UP","opponent_pawn":"DOWN"})
-        #player2.Send({"action":"launch_game","your_pawn":"UP","opponent_pawn":"DOWN","your_color":,"opponent_color":})
-        challenger.Send({"action":"launch_game","your_pawn":"DOWN","opponent_pawn":"UP"})
-        #challenger.Send({"action":"launch_game","your_pawn":"DOWN","opponent_pawn":"UP","your_color":,"opponent_color":})
+        player2.Send({"action":"launch_game","your_pawn":"UP","opponent_pawn":"DOWN","your_color":player2.color,"opponent_color":challenger.color})
+        challenger.Send({"action":"launch_game","your_pawn":"DOWN","opponent_pawn":"UP","your_color":challenger.color,"opponent_color":player2.color})
 
     def challenge_denied(self,challenged,challenger):
         challenger.Send({"action":"challenge_denied","opponent":challenged})
+
+    def get_player(self,nick):
+        return [p for p in self.players if p.nickname == nick][0]
 
 
 # get command line argument of server, port
