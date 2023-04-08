@@ -141,57 +141,10 @@ class ClientWindow(Tk):
         self.text_tournament()
         self.pack_tournament()
         self.afficher_liste_joueur(self.trier_liste(self.dico_list))
-        
-    def pack_tournament(self):
-        self.frame.pack()
-        self.f_affichage_liste.pack()
-        self.f_liste.pack()
-        self.L_adversaire.pack()
-        self.e_adversaire.pack()
-        self.f_adversaire.pack()
-        self.B_jouer.pack(side=BOTTOM)
-    
-    def text_tournament(self):
-        self.frame=Frame(self,bg=BACKGROUNDCOLOR)
-        self.f_affichage_liste=Frame(self,bg=BACKGROUNDCOLOR)
-        self.Label_liste=Label(self.f_affichage_liste,text='Classement joueurs',font=(FONT,10),bg=BACKGROUNDCOLOR,fg='white')
-        self.f_liste=Frame(self.f_affichage_liste,bg=BACKGROUNDCOLOR)
-        self.f_adversaire=Frame(self.frame,bg=BACKGROUNDCOLOR)
-        self.L_adversaire=Label(self.frame,text='choisis ton adversaire',font=(FONT,19),bg=BACKGROUNDCOLOR,fg='white')
-        self.e_adversaire=Entry(self.f_adversaire,font=(FONT,20),bg=BACKGROUNDCOLOR,fg='white')
-        self.B_jouer = Button(self,text='   Défier   ',command=self.defy_tournament ,bg='#4065A4')
-        
-    def afficher_liste_joueur(self,Liste_joueur):
-        for i in range(len(Liste_joueur)-2,-1,-2):
-            self.L_joueur=Label(self.f_liste,text=Liste_joueur[i]+" "+ str(Liste_joueur[i+1]),font=(FONT,10),bg='#4065A4',fg='black',bd=2,relief=SUNKEN)
-            self.L_joueur.pack(pady=2)
-    
-    def trier_liste(self,dico_list):
-        """
-            Prend le dico_list et le trie pour qu'il soit affichable
-        """
-        Liste_score_joueur=[]
-        for i in range(0,len(dico_list)):
-            a=dico_list[i]["score"]
-            Liste_score_joueur.append(a)
-        Liste_score_joueur.sort()
 
-        Liste_joueur=[]
-        for i in Liste_score_joueur:
-            for j in range(0,len(dico_list)):
-                if i==dico_list[j]["score"] and dico_list[j]["name"] not in Liste_joueur:
-                    a=dico_list[j]["name"]
-                    Liste_joueur.append(a)
-                    b=dico_list[j]["score"]
-                    Liste_joueur.append(b)
-        return Liste_joueur
-
-    def defy_tournament(self):
-        opponent = self.e_adversaire.get()
-        if len(opponent) == 0:
-            boxedmessage.showinfo(title=None, message="ON NE PEUT PAS DEFIER LE VIDE GROS MALIN")
-        else:
-            self.send_challenge(opponent)  
+    def set_tournament(self):
+        self.text_tournament()
+        self.pack_tournament()
 
     def myMainLoop(self):
         while self.client.state!=DEAD:   
@@ -205,6 +158,12 @@ class ClientWindow(Tk):
         """
         unpack tt le jeu si il existe puis génère et pack tt l'interface de tournoi
         """
+        if self.controller != None:
+            #UNPACK LE JEU 
+            self.set_tournament()
+        else:
+            self.set_tournament
+
 
     def ask_challenge(self,opponent):
         """
@@ -225,9 +184,65 @@ class ClientWindow(Tk):
         opponent est l'instance de classe avec tt les attributs du challenger
         informe le joueur que le défi a été refusé
         """
+        boxedmessage.showinfo(title=None, message="TU AS ETE REJETE")
+
         
     def launch_game(self,my_pawn,opponent_pawn,my_color,opponent_color):
         self.controller = Controller(self,self.client,my_pawn,opponent_pawn,my_color,opponent_color)
+
+    def unpack_game(self):
+        self.controller.view.unpack_all()
+
+    def pack_tournament(self):
+        self.frame.pack()
+        self.f_affichage_liste.pack()
+        self.f_liste.pack()
+        self.L_adversaire.pack()
+        self.e_adversaire.pack()
+        self.f_adversaire.pack()
+        self.B_jouer.pack(side=BOTTOM)
+    
+    def text_tournament(self):
+        self.frame=Frame(self,bg=BACKGROUNDCOLOR)
+        self.f_affichage_liste=Frame(self,bg=BACKGROUNDCOLOR)
+        self.Label_liste=Label(self.f_affichage_liste,text='Classement joueurs',font=(FONT,10),bg=BACKGROUNDCOLOR,fg='white')
+        self.f_liste=Frame(self.f_affichage_liste,bg=BACKGROUNDCOLOR)
+        self.f_adversaire=Frame(self.frame,bg=BACKGROUNDCOLOR)
+        self.L_adversaire=Label(self.frame,text='choisis ton adversaire',font=(FONT,19),bg=BACKGROUNDCOLOR,fg='white')
+        self.e_adversaire=Entry(self.f_adversaire,font=(FONT,20),bg=BACKGROUNDCOLOR,fg='white')
+        self.B_jouer = Button(self,text='   Défier   ',command=self.defy_tournament ,bg='#4065A4')
+    
+    def afficher_liste_joueur(self,Liste_joueur):
+        for i in range(len(Liste_joueur)-2,-1,-2):
+            self.L_joueur=Label(self.f_liste,text=Liste_joueur[i]+" "+ str(Liste_joueur[i+1]),font=(FONT,10),bg='#4065A4',fg='black',bd=2,relief=SUNKEN)
+            self.L_joueur.pack(pady=2)
+    
+    def defy_tournament(self):
+        opponent = self.e_adversaire.get()
+        if len(opponent) == 0:
+            boxedmessage.showinfo(title=None, message="ON NE PEUT PAS DEFIER LE VIDE GROS MALIN")
+        else:
+            self.send_challenge(opponent)  
+
+    def trier_liste(self,dico_list):
+        """
+            Prend le dico_list et le trie pour qu'il soit affichable
+        """
+        Liste_score_joueur=[]
+        for i in range(0,len(dico_list)):
+            a=dico_list[i]["score"]
+            Liste_score_joueur.append(a)
+        Liste_score_joueur.sort()
+
+        Liste_joueur=[]
+        for i in Liste_score_joueur:
+            for j in range(0,len(dico_list)):
+                if i==dico_list[j]["score"] and dico_list[j]["name"] not in Liste_joueur:
+                    a=dico_list[j]["name"]
+                    Liste_joueur.append(a)
+                    b=dico_list[j]["score"]
+                    Liste_joueur.append(b)
+        return Liste_joueur
 
 class Controller:
     def __init__(self,window,client,my_pawn,opponent_pawn,my_color,opponent_color):
