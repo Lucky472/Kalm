@@ -170,6 +170,7 @@ class Controller:
                     if self.model.test_add_wall((hole[0],hole[1]),"UP"):
                         self.controller_place_wall((hole[0],hole[1]),"UP")
                         self.send_placed_wall((hole[0],hole[1]),"UP")
+
             if (self.move == PLACE_WALL_ACROSS): 
                 hole = self.detect_clicked_hole(evt.x,evt.y)
                 if (hole != None):
@@ -238,15 +239,18 @@ class Controller:
         self.view.show_plays(x,y)
         
 class View:
-    def __init__(self,window,color,oponent_color):
+    def __init__(self,window,my_pawn,opponent_pawn,color,opponent_color):
         self.window = window
         self.canvas_board = Canvas(self.window,height = PIXEL_BOARD_Y_LENGTH + 2*Y_OFFSET,width =  PIXEL_BOARD_X_LENGTH + 2*X_OFFSET,bg =COLORBOARD )
         self.draw_board()
         self.canvas_board.pack()
         # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6) pour une taille de 7 cases
-        self.pawns = {"DOWN":self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1 ),"UP":self.draw_pawn(X_AXIS_LENGTH // 2, 0)}
+        if my_pawn == "UP":
+            self.pawns = {opponent_pawn:self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1 , opponent_color),my_pawn:self.draw_pawn(X_AXIS_LENGTH // 2, 0,color)}
+        else:
+            self.pawns = {my_pawn:self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1 ,color),opponent_pawn:self.draw_pawn(X_AXIS_LENGTH // 2, 0,opponent_color)}
         self.color = color 
-        self.oponent_color = oponent_color
+        self.oponent_color = opponent_color
         self.deletable_dots = []
 
     def draw_board(self):
@@ -265,10 +269,11 @@ class View:
                 x1 = (x+1)*SIZESQUARE - LENGTH_LINE + X_OFFSET +1
                 self.canvas_board.create_line(x0,y01,x1,y01,fill = COLORLINE,width=WIDTHLINE)
 
-    def draw_pawn(self,x,y):
+    def draw_pawn(self,x,y,color):
         x0,y0 = self.get_center(x,y)
-        idd =  self.canvas_board.create_oval(x0 - RADIUSPAWN,y0-RADIUSPAWN,x0 + RADIUSPAWN,y0 + RADIUSPAWN,fill = COLORLINE)
+        idd =  self.canvas_board.create_oval(x0 - RADIUSPAWN,y0-RADIUSPAWN,x0 + RADIUSPAWN,y0 + RADIUSPAWN,fill = color)
         return idd
+    
     def get_center(self,x,y):
         x0 = x*SIZESQUARE + X_OFFSET + SIZESQUARE//2
         y0 = y*SIZESQUARE + Y_OFFSET + SIZESQUARE//2
