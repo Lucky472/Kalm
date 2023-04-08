@@ -141,6 +141,7 @@ class ClientWindow(Tk):
         self.text_tournament()
         self.pack_tournament()
         self.afficher_liste_joueur(self.trier_liste(self.dico_list))
+        
     def pack_tournament(self):
         self.frame.pack()
         self.f_affichage_liste.pack()
@@ -191,7 +192,7 @@ class ClientWindow(Tk):
             boxedmessage.showinfo(title=None, message="ON NE PEUT PAS DEFIER LE VIDE GROS MALIN")
         else:
             self.send_challenge(opponent)  
-            
+
     def myMainLoop(self):
         while self.client.state!=DEAD:   
             self.update()
