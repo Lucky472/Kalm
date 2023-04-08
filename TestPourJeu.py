@@ -128,17 +128,15 @@ class Controller:
 class View:
     def __init__(self,window,color,oponent_color):
         self.window = window
-        self.canvas_board = Canvas(self.window,height = PIXEL_BOARD_Y_LENGTH + 2*Y_OFFSET,width =  PIXEL_BOARD_X_LENGTH + 2*X_OFFSET,bg =COLORBOARD )
+        self.canvas_board = Canvas(self.window, height = PIXEL_BOARD_Y_LENGTH + 2*Y_OFFSET, width =  PIXEL_BOARD_X_LENGTH + 2*X_OFFSET,bg =COLORBOARD )
         self.canvas_board.bind("<Button-1>",self.detect_clicked_square)
         self.draw_board()
         self.controller = Controller
 
-        self.canvas_board.pack()
         # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6)
         self.pawns = {"DOWN":self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1 ,"#67E3A8"),"UP":self.draw_pawn(X_AXIS_LENGTH // 2, 0,"#000000")}
         print(self.pawns)
 
-        self.canvas_board.pack()
         self.color = color 
         self.oponent_color = oponent_color
         # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6)
@@ -148,6 +146,12 @@ class View:
         self.frame_buttons(window)
         self.buttons()
         self.pack_buttons()
+        self.name = [{"name":"Lolo","score":18,"walls":3},{"name":"Lili","score":-2,"walls":7}]
+        self.frame_labels(window)
+        self.name_labels()
+        self.walls_left_labels()
+        self.pack_labels()
+        self.pack_board()
         
         
     def frame_buttons(self,window):
@@ -161,9 +165,30 @@ class View:
     def pack_buttons(self):
         self.f_buttons.pack(side=BOTTOM)
         self.B_horizontal_wall.pack(side=LEFT)
-        self.B_move.pack(side=LEFT,padx = PIXEL_BOARD_X_LENGTH//3)
+        self.B_move.pack(side=LEFT, padx = PIXEL_BOARD_X_LENGTH//3)
         self.B_vertical_wall.pack(side=RIGHT)
         
+    def frame_labels(self, window):
+        self.f_labels = Frame(window, width = WIDTHFRAME, height = HEIGHTFRAME)
+        
+    def name_labels(self):
+        #FAUDRA CHANGER LA LISTE SELF.NAME
+        self.L_name_left = Label(self.f_labels, text = str(self.name[0]["name"]))
+        self.L_name_right = Label(self.f_labels, text = str(self.name[1]["name"]))
+    
+    def walls_left_labels(self):
+        self.L_wall_left = Label(self.f_labels, text = str(self.name[0]["walls"]))
+        self.L_wall_right = Label(self.f_labels, text = "WALLS LEFT" + "  " + str(self.name[1]["walls"]))
+    
+    def pack_labels(self):
+        self.f_labels.pack(side=TOP)
+        self.L_name_left.pack(side=LEFT, padx=PIXEL_BOARD_X_LENGTH//4,expand=YES)
+        self.L_name_right.pack(side=RIGHT, padx=PIXEL_BOARD_X_LENGTH//4, expand=YES)
+        self.L_wall_left.pack(side=LEFT)
+        self.L_wall_right.pack(side=RIGHT)
+        
+    def pack_board(self):
+        self.canvas_board.pack(side=TOP)
 
     def draw_board(self):
         #Lignes verticales
@@ -182,6 +207,7 @@ class View:
                 self.canvas_board.create_line(x0,y01,x1,y01,fill = COLORLINE,width=WIDTHLINE)
 
 #PAS CENSE ÊTRE LA, mais pour tester la fonction
+#OK.
     def detect_clicked_square(self,evt):
         print("clic")
         pixel_x = evt.x
