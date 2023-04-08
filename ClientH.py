@@ -284,8 +284,8 @@ class View:
             self.deletable_dots.append(self.canvas_board.create_oval(x0 - RADIUSDOTS,y0-RADIUSDOTS,x0 + RADIUSDOTS,y0 + RADIUSDOTS,fill = COLORDOT))
 
     def delete_deletable_dots(self):
-        for x in self.deletable_dots:
-            self.canvas_board.delete(x)
+        for i in range(0,len(self.deletable_dots)):
+            self.canvas_board.delete(self.deletable_dots.pop(0))
 
     def place_vertical_wall(self,x,y):
         x0 = x*SIZESQUARE +X_OFFSET + WIDTHLINE
