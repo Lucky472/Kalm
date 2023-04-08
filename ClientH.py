@@ -41,7 +41,6 @@ MOVE_PAWN = 0
 PLACE_WALL_UP = 1
 PLACE_WALL_ACROSS = 2
 
-
 class Client(ConnectionListener):
     def __init__(self, host, port, window,color,nickname):
         self.window = window
@@ -105,7 +104,7 @@ class Client(ConnectionListener):
         indique au joueur que il ne peut pas défier le joueur
         (data["opponent"]) est le joueur ne pouvant pas être défié
         """
-        boxedmessage.showinfo(title=None, message="le joueur "+str(data["opponent"]+" ne peut pas être défié"))
+        boxedmessage.showinfo(title=None, message="le joueur: "+str(data["opponent"]+" ne peut pas être défié"))
     
     def Network_challenge_denied(self,data):
         self.window.challenge_denied(data["opponent"])
@@ -142,15 +141,17 @@ class ClientWindow(Tk):
         opponent est l'élément de dico avec tt les attributs du challenger
         informe le joueur que le challenge a été refusé
         """
-
+        
     def launch_game(self,my_pawn,opponent_pawn):
         self.controller = Controller(self,self.client,my_pawn,opponent_pawn)
+        #LE CONTROLLEUR DOIT FOURNIR LA COULEUR DU JOUEUR PUIS LA COULEUR DE L'ADVERSAIRE
 
 class Controller:
     def __init__(self,window,client,my_pawn,opponent_pawn):
         self.window = window
         self.client = client
         self.model = Model()
+        #LE CONTROLLEUR DOIT FOURNIR LA COULEUR DU JOUEUR PUIS LA COULEUR DE L'ADVERSAIRE
         self.view = View(window)
         self.view.canvas_board.bind("<Button-1>",self.board_click)
         self.move = MOVE_PAWN
@@ -241,7 +242,7 @@ class View:
         self.window = window
         self.canvas_board = Canvas(self.window,height = PIXEL_BOARD_Y_LENGTH + 2*Y_OFFSET,width =  PIXEL_BOARD_X_LENGTH + 2*X_OFFSET,bg =COLORBOARD )
         self.draw_board()
-        self.canvas_.pack()
+        self.canvas_board.pack()
         # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6) pour une taille de 7 cases
         self.pawns = {"DOWN":self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1 ),"UP":self.draw_pawn(X_AXIS_LENGTH // 2, 0)}
         self.color = color 
