@@ -263,6 +263,7 @@ class View:
             self.pawns = {opponent_pawn:self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1 , opponent_color),my_pawn:self.draw_pawn(X_AXIS_LENGTH // 2, 0,color)}
         else:
             self.pawns = {my_pawn:self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1 ,color),opponent_pawn:self.draw_pawn(X_AXIS_LENGTH // 2, 0,opponent_color)}
+        
         self.color = color 
         self.oponent_color = opponent_color
         self.deletable_dots = []
