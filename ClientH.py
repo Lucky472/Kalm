@@ -154,7 +154,7 @@ class ClientWindow(Tk):
     def challenge_denied(opponent):
         """
         opponent est l'élément de dico avec tt les attributs du challenger
-        informe le joueur que le challenge a été refusé
+        informe le joueur que le défi a été refusé
         """
         
     def launch_game(self,my_pawn,opponent_pawn,my_color,opponent_color):
@@ -172,9 +172,16 @@ class Controller:
         self.state = INITIAL
         self.my_pawn = my_pawn
         self.opponent_pawn = opponent_pawn
+        if self.my_pawn == "UP":
+            self.set_active()
+        else : 
+            self.set_inactive()
     
     def set_active(self):
         self.state = ACTIVE
+        
+    def set_inactive(self):
+        self.state = INACTIVE
     
     def board_click(self,evt):
         if (self.state == ACTIVE):
@@ -202,8 +209,12 @@ class Controller:
         x,y = location
         self.view.move_pawn(x, y, pawn)
         self.model.move_pawn(pawn, location)
+        self.test_end_game()
         self.state = INACTIVE
         
+    def test_end_game(self):
+        pass
+    
     def controller_place_wall(self,location,orientation):
         x,y = location
         self.view.place_wall(x,y,self.move)  

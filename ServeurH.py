@@ -46,7 +46,7 @@ class ClientChannel(Channel):
         self._server.launch_game(challenged_nick,opponent)
     
     def Network_challenge_denied(self,data):
-        self._server.challenge_denied(self,data)
+        self._server.challenge_denied(self,data["opponent"])
 
 class MyServer(Server):
     channelClass = ClientChannel
