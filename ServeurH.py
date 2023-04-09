@@ -121,6 +121,7 @@ class MyServer(Server):
                 player2.state = IN_CHALLENGE
         else :
             challenger.Send({"action":"cannot_challenge","opponent_nickname":player2.nickname})
+            challenger.state = IN_LOBBY
         self.update_leaderboard()
     
     def can_challenge(self,challenger,player2):
