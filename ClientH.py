@@ -179,7 +179,11 @@ class ClientWindow(Tk):
         demande au joueur si il accepte le défi lancé par un joueur tiers
         (si oui, return True
          si non, return False)
-        """  
+        """ 
+        answer = boxedmessage.askyesno(title = "Défi de "+ str(opponent.nickname),message =str(opponent.nickname)+" vous défie, voulez vous accepter ?")
+        if answer == YES:
+            return True
+        return False
 
     def send_challenge(self,opponent_nickname):
         """
