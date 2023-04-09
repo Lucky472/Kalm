@@ -17,14 +17,15 @@ RADIUSPAWN = 17
 RADIUSDOTS = 5
 COLORDOT = "#EEEEEE"
 COLORBOARD = "#454545"
-BACKGROUNDCOLOR = '#41B77F'
+BACKGROUNDCOLOR = '#19a5b0'
 FONT = 'arial'
 WIDTHWALL = 10
 WIDTHLINE = 4
 WIDTHFRAME = BOARD_X_LENGTH
 HEIGHTFRAME = BOARD_Y_LENGTH//4
 COLORLINE = "#D4D4D4"
-COLORWALL = "#4d8b2b"
+COLORWALL = "#fe8e0c"
+#"#4d8b2b"
 LENGTH_LINE = 10
 PIXEL_BOARD_X_LENGTH = X_AXIS_LENGTH * SIZESQUARE
 PIXEL_BOARD_Y_LENGTH = Y_AXIS_LENGTH * SIZESQUARE
@@ -35,7 +36,7 @@ INITWALL = 7
 HOST, PORT = "localhost", "31425"
 NICKNAME = "nick"
 BASECOLOR = "#ca7511"
-
+WINDOW_GEOMETRY = "840x420"
 INITIAL=0
 ACTIVE=1
 DEAD=-1
@@ -139,7 +140,7 @@ class Client(ConnectionListener):
 class ClientWindow(Tk):
     def __init__(self, host, port,color,nickname):
         Tk.__init__(self)
-        self.geometry("840x520")
+        self.geometry(WINDOW_GEOMETRY)
         self.configure(bg=BACKGROUNDCOLOR)
         self.client = Client(host, int(port), self,color,nickname)
         self.controller = None
