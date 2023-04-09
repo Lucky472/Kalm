@@ -33,7 +33,7 @@ class ClientChannel(Channel):
         data["who"] = self.opponent.nickname
         data["action"] = data["sent_action"]
         new_data = {key:data[key] for key in data if key != "sent_action"}
-        self.SendTo(new_data)
+        self._server.SendTo(new_data)
         
     def Network_send_to_all(self,data):
         self.SendToAll(data)
@@ -56,10 +56,10 @@ class ClientChannel(Channel):
     def Network_challenge_denied(self,data):
         self._server.challenge_denied(self,data["opponent"])
 
-    def Network_i_won(self):
+    def Network_i_won(self,data):
         self._server.game_ended(self, WON, self.opponent)
 
-    def Network_i_lost(self):
+    def Network_i_lost(self,data):
         self._server.game_ended(self, LOST, self.opponent)
 
 class MyServer(Server):

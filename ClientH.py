@@ -54,7 +54,7 @@ class Client(ConnectionListener):
         self.window = window
         self.color = color
         self.nickname = nickname
-        self.oponent_color = "#f3f300"
+        self.opponent_color = "#f3f300"
         self.state=INITIAL
         self.Connect((host, port))
         print("Client started")
@@ -125,7 +125,7 @@ class Client(ConnectionListener):
     def Network_challenge_denied(self,data):
         self.window.challenge_denied(data["opponent"])
         
-    def Network_close_game(self):
+    def Network_close_game(self,data):
         self.window.show_tournament()
         
         
@@ -139,17 +139,15 @@ class ClientWindow(Tk):
         self.client = Client(host, int(port), self,color,nickname)
         self.controller = None
         self.dico_list=[{"name":"matteo","score":2},{"name":"killian","score":13},{"name":"adrien","score":12},{"name":"lucas","score":4}]
-        self.text_tournament()
-        self.pack_tournament()
-        self.afficher_liste_joueur(self.trier_liste(self.dico_list))
+        #self.afficher_liste_joueur(self.trier_liste(self.dico_list))
 
     def set_tournament(self):
-        self.bind('<Enter>',self.defy_tournament)
+        self.bind('<Return>',self.defy_tournament)
         self.text_tournament()
         self.pack_tournament()
 
     def unset_tournament(self):
-        self.unbind('<Enter>')
+        self.unbind('<Return>')
         self.frame.destroy()
         self.f_affichage_liste.destroy()
         self.f_adversaire.destroy()
@@ -233,7 +231,7 @@ class ClientWindow(Tk):
             self.L_joueur=Label(self.f_liste,text=Liste_joueur[i]+" "+ str(Liste_joueur[i+1]),font=(FONT,10),bg='#4065A4',fg='black',bd=2,relief=SUNKEN)
             self.L_joueur.pack(pady=0,fill=X)
     
-    def defy_tournament(self):
+    def defy_tournament(self,evt):
         opponent = self.e_adversaire.get()
         if len(opponent) == 0:
             boxedmessage.showinfo(title=None, message="ON NE PEUT PAS DÉFIER LE VIDE GROS MALIN")
@@ -266,7 +264,7 @@ class Controller:
         self.client = client
         self.model = Model()
         #LE CONTROLLEUR DOIT FOURNIR LA COULEUR DU JOUEUR PUIS LA COULEUR DE L'ADVERSAIRE
-        self.view = View(window,my_pawn,opponent_pawn,my_color,opponent_color)
+        self.view = View(self,window,my_pawn,opponent_pawn,my_color,opponent_color)
         self.view.canvas_board.bind("<Button-1>",self.board_click)
         self.move = MOVE_PAWN
         self.state = INITIAL
@@ -285,21 +283,27 @@ class Controller:
     
     def board_click(self,evt):
         if (self.state == ACTIVE):
+            print("clic")
             if (self.move == PLACE_WALL_UP): 
+                print("clic up")
                 hole = self.detect_clicked_hole(evt.x,evt.y)
                 if (hole != None):
                     if self.model.test_add_wall((hole[0],hole[1]),"UP"):
                         self.controller_place_wall((hole[0],hole[1]),"UP")
                         self.send_placed_wall((hole[0],hole[1]),"UP")
             if (self.move == PLACE_WALL_ACROSS): 
+                print("clic side")
                 hole = self.detect_clicked_hole(evt.x,evt.y)
+                print(hole)
                 if (hole != None):
                     if self.model.test_add_wall((hole[0],hole[1]),"ACROSS"):
                         self.controller_place_wall((hole[0],hole[1]),"ACROSS")
                         self.send_placed_wall((hole[0],hole[1]),"ACROSS")
             if self.move == MOVE_PAWN :
+                print("clic move")
                 square = self.detect_clicked_square(evt.x,evt.y)
-                if square != None and square in self.model.accessible_from(self.model.pawns[self.my_pawn]):
+                print(square)
+                if square != None and square in self.model.accessible_from(self.model.pawns[self.my_pawn].coords):
                     self.controller_move_pawn(self.my_pawn, square)
                     self.send_moved_pawn(square)
 
@@ -363,7 +367,7 @@ class Controller:
                 y_maxus = (y+1)*SIZESQUARE + Y_OFFSET - WIDTHLINE
                 if (pixel_x >= x_minus) and (pixel_x <= x_maxus):
                     if (pixel_y >= y_minus) and (pixel_y <= y_maxus):
-                        return (x,y)
+                        return (2*x,2*y)
     
     def send_placed_wall(self,location,orientation):
         self.client.Send({"action":"send_to_opponent", "sent_action":"placed_wall", "location":location, "orientation":orientation})
@@ -382,33 +386,36 @@ class Controller:
     def set_move_pawn(self):
         self.move = MOVE_PAWN
         x,y = self.model.pawns[self.my_pawn].coords
-        self.view.show_plays(x,y)
+        self.view.show_plays(self.model.accessible_from((x,y)))
         
 class View:
-    def __init__(self,window,my_pawn,opponent_pawn,color,opponent_color):
+    def __init__(self,controller,window,my_pawn,opponent_pawn,color,opponent_color):
+        self.controller = controller
         self.window = window
         self.canvas_board = Canvas(self.window,height = PIXEL_BOARD_Y_LENGTH + 2*Y_OFFSET,width =  PIXEL_BOARD_X_LENGTH + 2*X_OFFSET,bg =COLORBOARD )
         self.draw_board()
         self.canvas_board.pack()
         # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6) pour une taille de 7 cases
         if my_pawn == "UP":
-            self.pawns = {opponent_pawn:self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1 , opponent_color),my_pawn:self.draw_pawn(X_AXIS_LENGTH // 2, 0,color)}
+            self.pawns = {opponent_pawn:self.draw_pawn(BOARD_X_LENGTH // 2,BOARD_Y_LENGTH-1 , opponent_color),my_pawn:self.draw_pawn(BOARD_X_LENGTH // 2, 0,color)}
         else:
-            self.pawns = {my_pawn:self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1 ,color),opponent_pawn:self.draw_pawn(X_AXIS_LENGTH // 2, 0,opponent_color)}
+            self.pawns = {my_pawn:self.draw_pawn(BOARD_X_LENGTH // 2,BOARD_Y_LENGTH-1 ,color),opponent_pawn:self.draw_pawn(BOARD_X_LENGTH // 2, 0,opponent_color)}
+        self.my_pawn = my_pawn
+        self.opponent_pawn = opponent_pawn
         self.color = color 
-        self.oponent_color = opponent_color
+        self.opponent_color = opponent_color
         self.deletable_dots = []
-        self.frame_buttons(window)
+        self.frame_buttons()
         self.buttons()
         self.pack_buttons()
         
-    def frame_buttons(self,window):
-        self.f_buttons = Frame(window, width = WIDTHFRAME, height = HEIGHTFRAME)
+    def frame_buttons(self):
+        self.f_buttons = Frame(self.window, width = WIDTHFRAME, height = HEIGHTFRAME)
     
     def buttons(self):
-       self.B_move = Button(self.f_buttons, text = "Se déplacer", command = self.controller.set_move_pawn(self))
-       self.B_horizontal_wall = Button(self.f_buttons, text = "Mur horizontal", command = self.controller.set_wall_horisontal(self))
-       self.B_vertical_wall = Button(self.f_buttons, text = "Mur vertical", command = self.controller.set_wall_vertical(self))
+       self.B_move = Button(self.f_buttons, text = "Se déplacer", command = self.controller.set_move_pawn)
+       self.B_horizontal_wall = Button(self.f_buttons, text = "Mur horizontal", command = self.controller.set_wall_horizontal)
+       self.B_vertical_wall = Button(self.f_buttons, text = "Mur vertical", command = self.controller.set_wall_vertical)
     
     def pack_buttons(self):
         self.f_buttons.pack(side=BOTTOM)
@@ -438,8 +445,8 @@ class View:
         return idd
     
     def get_center(self,x,y):
-        x0 = x*SIZESQUARE + X_OFFSET + SIZESQUARE//2
-        y0 = y*SIZESQUARE + Y_OFFSET + SIZESQUARE//2
+        x0 = (x//2)*SIZESQUARE + X_OFFSET + SIZESQUARE//2
+        y0 = (y//2)*SIZESQUARE + Y_OFFSET + SIZESQUARE//2
         return (x0,y0)
 
     def delete_pawn(self,pawn_id):
@@ -447,7 +454,11 @@ class View:
         
     def move_pawn(self,x,y,pawn_id):
         self.delete_pawn(pawn_id)
-        self.pawns[pawn_id] = self.draw_pawn(x,y)
+        if pawn_id == self.my_pawn:
+            color = self.color
+        else:
+            color = self.opponent_color
+        self.pawns[pawn_id] = self.draw_pawn(x,y,color)
     
     def place_wall(self,x,y,orientation):
             if type == PLACE_WALL_ACROSS:
@@ -469,17 +480,16 @@ class View:
 
     def place_vertical_wall(self,x,y):
         x0 = x*SIZESQUARE +X_OFFSET + WIDTHLINE
-        y0 = y*SIZESQUARE +Y_OFFSET +SPACING
+        y0 = (y-1)*SIZESQUARE +Y_OFFSET +SPACING
         x1 = x*SIZESQUARE +X_OFFSET - WIDTHLINE
-        y1 = (y+2)*SIZESQUARE +Y_OFFSET -SPACING
+        y1 = (y+1)*SIZESQUARE +Y_OFFSET -SPACING
         self.canvas_board.create_rectangle(x0,y0,x1,y1,fill = COLORWALL)
-
 
     def place_horizontal_wall(self,x,y):
         y0 = y*SIZESQUARE +Y_OFFSET + WIDTHLINE
-        x0 = x*SIZESQUARE +X_OFFSET +SPACING
+        x0 = (x-1)*SIZESQUARE +X_OFFSET +SPACING
         y1 = y*SIZESQUARE +Y_OFFSET - WIDTHLINE
-        x1 = (x+2)*SIZESQUARE +X_OFFSET -SPACING
+        x1 = (x+1)*SIZESQUARE +X_OFFSET -SPACING
         self.canvas_board.create_rectangle(x0,y0,x1,y1,fill = COLORWALL)
         
     def show_winner(self,winner):
@@ -504,7 +514,7 @@ class View:
 class Model :
     def __init__(self):
         self.board = self.new_board()
-        self.pawns = {"UP":Pawn((BOARD_X_LENGTH // 2, 0)), "DOWN":Pawn((BOARD_X_LENGTH // 2, BOARD_Y_LENGTH))}
+        self.pawns = {"DOWN":Pawn((BOARD_X_LENGTH // 2, 0)), "UP":Pawn((BOARD_X_LENGTH // 2, BOARD_Y_LENGTH -1))}
     
     def new_board(self):
         board = [[0 for j in range(BOARD_Y_LENGTH)] for i in range(BOARD_X_LENGTH)]
@@ -562,49 +572,56 @@ class Model :
         if orientation == "ACROSS":
             if self.board[x-1][y].occupied or self.board[x][y].occupied or self.board[x+1][y].occupied :
                 return False
-        return self.pathfind_test_with_wall_from(location,orientation)
+        return self.pathfind_test_with_wall(location,orientation)
     
     def accessible_from(self,location,avoid = None):
         x,y = location
         accessible_squares = []
+        print(location)
         #aller à gauche
-        if x != 0 and not self.board[x-1][y].occupied:
-            if not self.board[x-2][y].occupied:
-                accessible_squares.append((x-2,y))
-            elif (x-2,y) != avoid:
-                for square in self.accessible_from((x-2,y),avoid = location):
-                    accessible_squares.append(square)
+        if x != 0 :
+            if not self.board[x-1][y].occupied:
+                if not self.board[x-2][y].occupied:
+                    accessible_squares.append((x-2,y))
+                elif (x-2,y) != avoid:
+                    for square in self.accessible_from((x-2,y),avoid = location):
+                        accessible_squares.append(square)
         #aller à droite
-        if x != BOARD_X_LENGTH and not self.board[x+1][y].occupied:
-            if not self.board[x+2][y].occupied:
-                accessible_squares.append((x+2,y))
-            elif (x+2,y) != avoid:
-                for square in self.accessible_from((x+2,y),avoid = location):
-                    accessible_squares.append(square)
+        if x != BOARD_X_LENGTH -1 :
+            if not self.board[x+1][y].occupied:
+                if not self.board[x+2][y].occupied:
+                    accessible_squares.append((x+2,y))
+                elif (x+2,y) != avoid:
+                    for square in self.accessible_from((x+2,y),avoid = location):
+                        accessible_squares.append(square)
         #aller en haut
-        if y != 0 and not self.board[x][y-1].occupied:
-            if not self.board[x][y-2].occupied:
-                accessible_squares.append((x,y-2))
-            elif (x,y-2) != avoid:
-                for square in self.accessible_from((x,y-2),avoid = location):
-                    accessible_squares.append(square)
+        if y != 0 :
+            if not self.board[x][y-1].occupied:
+                if not self.board[x][y-2].occupied:
+                    accessible_squares.append((x,y-2))
+                elif (x,y-2) != avoid:
+                    for square in self.accessible_from((x,y-2),avoid = location):
+                        accessible_squares.append(square)
         #aller en bas
-        if y != BOARD_Y_LENGTH and not self.board[x][y+1].occupied:
-            if not self.board[x][y+2].occupied:
-                accessible_squares.append((x,y+2))
-            elif (x,y+2) != avoid:
-                for square in self.accessible_from((x,y+2),avoid = location):
-                    accessible_squares.append(square)
+        if y != BOARD_Y_LENGTH -1:
+            if not self.board[x][y+1].occupied:
+                if not self.board[x][y+2].occupied:
+                    accessible_squares.append((x,y+2))
+                elif (x,y+2) != avoid:
+                    for square in self.accessible_from((x,y+2),avoid = location):
+                        accessible_squares.append(square)
         return accessible_squares
     
     def pathfind_test_with_wall(self,location,orientation):
         self.add_wall(location, orientation)
-        for key,pawn in self.pawns:
+        for key in self.pawns:
+            pawn = self.pawns[key]
             if key == "UP":
                 test = self.pathfind_test(pawn.coords, 0)
             else :
                 test = self.pathfind_test(pawn.coords, BOARD_Y_LENGTH)
         self.remove_wall(location, orientation)
+        print(test)
         return test
     
     def pathfind_test(self,location,targeted_y,all_accessibles=[],new_accessibles=[]):
@@ -612,6 +629,7 @@ class Model :
             acc = list(self.accessible_from(location))
             new_accessibles = acc
             all_accessibles = acc
+            all_accessibles.append(location)
         else: 
             border = []
             for new_square in new_accessibles:
@@ -621,9 +639,10 @@ class Model :
                             return True
                         border.append(square)
                         all_accessibles.append(square)
-        if len(border) == 0:
+            new_accessibles = border
+        if len(new_accessibles) == 0:
             return False
-        return self.pathfind_test(location,targeted_y,all_accessibles=all_accessibles,new_accessibles=border)
+        return self.pathfind_test(location,targeted_y,all_accessibles=all_accessibles,new_accessibles=new_accessibles)
 
 class Pawn :
     def __init__(self,coords):
