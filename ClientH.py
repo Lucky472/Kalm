@@ -233,7 +233,7 @@ class ClientWindow(Tk):
             boxedmessage.showinfo(title=None, message="ON NE PEUT PAS DÉFIER LE VIDE GROS MALIN")
         else:
             list_nicknames = [p["nickname"] for p in self.leaderboard]
-            if opponent in list_nickname :
+            if opponent in list_nicknames :
                 self.send_challenge(opponent)
             else :
                 boxedmessage.showinfo(title=None, message="CE GARS N'EXISTE PAS")
