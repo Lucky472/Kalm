@@ -100,7 +100,7 @@ class Client(ConnectionListener):
     
     def Network_placed_wall(self,data):
         self.window.controller.controller_place_wall(data["location"], data["orientation"])
-        self.window.controller.opponent_walls.set(self.opponent_walls.get()-1)
+        self.window.controller.opponent_walls.set(self.window.controller.opponent_walls.get()-1)
         self.window.controller.set_active()
         
     def Network_moved_pawn(self,data):
@@ -138,7 +138,7 @@ class Client(ConnectionListener):
 class ClientWindow(Tk):
     def __init__(self, host, port,color,nickname):
         Tk.__init__(self)
-        self.geometry("1280x720")
+        self.geometry("840x840")
         self.configure(bg=BACKGROUNDCOLOR)
         self.client = Client(host, int(port), self,color,nickname)
         self.controller = None
