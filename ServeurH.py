@@ -50,8 +50,10 @@ class ClientChannel(Channel):
 
     def Network_challenge_accepted(self,data):
         challenged_nick = data["challenged"]
-        opponent = data["opponent"]
-        self._server.launch_game(challenged_nick,opponent)
+        opponent_nickname = data["opponent_nickname"]
+        challenged = self._server.get_player(challenged_nick)
+        opponent = self._server.get_player(opponent_nickname)
+        self._server.launch_game(challenged,opponent)
     
     def Network_challenge_denied(self,data):
         self._server.challenge_denied(self,data["opponent"])
@@ -114,21 +116,19 @@ class MyServer(Server):
             if self.is_forced_challenge(challenger,player2) :
                 self.launch_game(challenger,player2)
             else :
-                player2.Send({"action":"challenge","opponent":challenger})
+                player2.Send({"action":"challenge","opponent_nickname":challenger.nickname})
                 player2.state = IN_CHALLENGE
         else :
-            challenger.Send({"action":"cannot_challenge","opponent":player2})
+            challenger.Send({"action":"cannot_challenge","opponent_nickname":player2.nickname})
     
     def can_challenge(self,challenger,player2):
         """
         prends en compte: l'écart de points ET le fait qu'il soit en game
         """
-        
         return abs(challenger.score - player2.score) < 300
             
         
     def is_forced_challenge(self,challenger,player2):
-        
         return abs(challenger.score - player2.score) < 200
     
     def launch_game(self,challenger,player2):
@@ -139,10 +139,10 @@ class MyServer(Server):
         player2.state = IN_GAME
         challenger.state = IN_GAME
         
-    def challenge_denied(self,challenged,challenger):
-        challenger.Send({"action":"challenge_denied","opponent":challenged})
+    def challenge_denied(self,challenged_player,challenger):
+        challenger.Send({"action":"challenge_denied","opponent_nickname":challenged_player.nickname})
         challenger.state = IN_LOBBY
-        challenged.state = IN_LOBBY
+        challenged_player.state = IN_LOBBY
 
     def get_player(self,nick):
         return [p for p in self.players if p.nickname == nick][0]
