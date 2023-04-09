@@ -282,6 +282,12 @@ class Controller:
     def __init__(self,window,client,my_pawn,opponent_pawn,my_color,opponent_color,my_nickname,opponent_nickname):
         self.window = window
         self.client = client
+        self.my_nickname = my_nickname
+        self.opponent_nickname = opponent_nickname
+        self.my_walls = IntVar()
+        self.my_walls.set(INITWALL)
+        self.opponent_walls = IntVar()
+        self.opponent_walls.set(INITWALL)
         self.model = Model()
         #LE CONTROLLEUR DOIT FOURNIR LA COULEUR DU JOUEUR PUIS LA COULEUR DE L'ADVERSAIRE
         self.view = View(self,window,my_pawn,opponent_pawn,my_color,opponent_color)
