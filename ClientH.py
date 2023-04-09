@@ -303,7 +303,7 @@ class Controller:
     
     def board_click(self,evt):
         if (self.state == ACTIVE):
-            if (self.move == PLACE_WALL_UP) and (self.view.my_walls.get() > 0): 
+            if (self.move == PLACE_WALL_UP) and (self.view.my_walls > 0): 
                 hole = self.detect_clicked_hole(evt.x,evt.y)
                 if (hole != None):
                     if self.model.test_add_wall((hole[0],hole[1]),"UP"):
@@ -313,7 +313,7 @@ class Controller:
                         self.view.L_wall_left.configure["text"] = self.view.my_walls
                     else:
                         boxedmessage.showinfo(title=None, message="TU PEUX PAS LE METTRE LA !")
-            if (self.move == PLACE_WALL_ACROSS)and (self.view.my_walls.get() > 0): 
+            if (self.move == PLACE_WALL_ACROSS)and (self.view.my_walls > 0): 
                 print("clic side")
                 hole = self.detect_clicked_hole(evt.x,evt.y)
                 if (hole != None):
