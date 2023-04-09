@@ -100,7 +100,7 @@ class Client(ConnectionListener):
     
     def Network_placed_wall(self,data):
         self.window.controller.controller_place_wall(data["location"], data["orientation"])
-        self.window.controller.opponent_walls.set(self.window.controller.opponent_walls.get()-1)
+        self.window.controller.view.opponent_walls.set(self.window.controller.view.opponent_walls.get()-1)
         self.window.controller.set_active()
         
     def Network_moved_pawn(self,data):
@@ -275,10 +275,8 @@ class Controller:
         self.client = client
         self.my_nickname = my_nickname
         self.opponent_nickname = opponent_nickname
-        self.my_walls = IntVar()
-        self.my_walls.set(INITWALL)
-        self.opponent_walls = IntVar()
-        self.opponent_walls.set(INITWALL)
+
+
         self.model = Model()
         #LE CONTROLLEUR DOIT FOURNIR LA COULEUR DU JOUEUR PUIS LA COULEUR DE L'ADVERSAIRE
         self.view = View(self,window,my_pawn,opponent_pawn,my_color,opponent_color)
@@ -304,23 +302,23 @@ class Controller:
     
     def board_click(self,evt):
         if (self.state == ACTIVE):
-            if (self.move == PLACE_WALL_UP) and (self.my_walls.get() > 0): 
+            if (self.move == PLACE_WALL_UP) and (self.view.my_walls.get() > 0): 
                 hole = self.detect_clicked_hole(evt.x,evt.y)
                 if (hole != None):
                     if self.model.test_add_wall((hole[0],hole[1]),"UP"):
                         self.controller_place_wall((hole[0],hole[1]),"UP")
                         self.send_placed_wall((hole[0],hole[1]),"UP")
-                        self.my_walls.set(self.my_walls.get()-1)
+                        self.view.my_walls.set(self.view.my_walls.get()-1)
                     else:
                         boxedmessage.showinfo(title=None, message="TU PEUX PAS LE METTRE LA !")
-            if (self.move == PLACE_WALL_ACROSS)and (self.my_walls.get() > 0): 
+            if (self.move == PLACE_WALL_ACROSS)and (self.view.my_walls.get() > 0): 
                 print("clic side")
                 hole = self.detect_clicked_hole(evt.x,evt.y)
                 if (hole != None):
                     if self.model.test_add_wall((hole[0],hole[1]),"ACROSS"):
                         self.controller_place_wall((hole[0],hole[1]),"ACROSS")
                         self.send_placed_wall((hole[0],hole[1]),"ACROSS")
-                        self.my_walls.set(self.my_walls.get()-1)
+                        self.view.my_walls.set(self.view.my_walls.get()-1)
             if self.move == MOVE_PAWN :
                 square = self.detect_clicked_square(evt.x,evt.y)
                 if square != None and square in self.model.accessible_from(self.model.pawns[self.my_pawn].coords):
@@ -427,9 +425,9 @@ class View:
         self.deletable_dots = []
 
         self.my_walls = IntVar()
-        self.my_walls.set(7)
+        self.my_walls.set(INITWALL)
         self.opponent_walls = IntVar()
-        self.opponent_walls.set(7)   
+        self.opponent_walls.set(INITWALL)
 
         self.frame_buttons()
         self.frame_labels()
@@ -466,8 +464,8 @@ class View:
     
     def pack_labels(self):
         self.f_labels.pack(side=TOP)
-        self.L_name_left.pack(side=LEFT, padx=PIXEL_BOARD_X_LENGTH//4,expand=YES)
-        self.L_name_right.pack(side=RIGHT, padx=PIXEL_BOARD_X_LENGTH//4, expand=YES)
+        self.L_name_left.pack(side=LEFT, padx=PIXEL_BOARD_X_LENGTH//6,expand=YES)
+        self.L_name_right.pack(side=RIGHT, padx=PIXEL_BOARD_X_LENGTH//6, expand=YES)
         self.L_wall_left.pack(side=LEFT)
         self.L_wall_middle.pack(side = LEFT)
         self.L_wall_right.pack(side=RIGHT)
@@ -475,7 +473,7 @@ class View:
     def pack_buttons(self):
         self.f_buttons.pack(side=BOTTOM)
         self.B_horizontal_wall.pack(side=LEFT)
-        self.B_move.pack(side=LEFT,padx = PIXEL_BOARD_X_LENGTH//3)
+        self.B_move.pack(side=LEFT,padx = PIXEL_BOARD_X_LENGTH//4)
         self.B_vertical_wall.pack(side=RIGHT)
 
     def draw_board(self):
