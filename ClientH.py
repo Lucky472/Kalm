@@ -142,8 +142,6 @@ class ClientWindow(Tk):
         self.configure(bg=BACKGROUNDCOLOR)
         self.client = Client(host, int(port), self,color,nickname)
         self.controller = None
-        self.dico_list=[{"name":"matteo","score":2},{"name":"killian","score":13},{"name":"adrien","score":12},{"name":"lucas","score":4}]
-        #self.afficher_liste_joueur(self.trier_liste(self.dico_list))
         self.f_affichage_liste=Frame(self,bg='white',bd=2,relief=SUNKEN)
         self.f_affichage_liste.pack(expand=YES, side=RIGHT)
         self.L_joueur = []
@@ -234,7 +232,11 @@ class ClientWindow(Tk):
         if len(opponent) == 0:
             boxedmessage.showinfo(title=None, message="ON NE PEUT PAS DÉFIER LE VIDE GROS MALIN")
         else:
-            self.send_challenge(opponent)  
+            list_nicknames = [p["nickname"] for p in self.leaderboard]
+            if opponent in list_nicknames :
+                self.send_challenge(opponent)
+            else :
+                boxedmessage.showinfo(title=None, message="CE GARS N'EXISTE PAS")
 
     """
     def trier_liste(self,dico_list):
@@ -271,6 +273,7 @@ class ClientWindow(Tk):
 
     def update_leaderboard(self,leaderboard):
         leaderboard = self.sorted_leaderboard(leaderboard)
+        self.leaderboard = leaderboard
         for joueur in self.L_joueur :
             joueur.destroy()
         self.f_liste.destroy()

@@ -149,7 +149,9 @@ class MyServer(Server):
         self.update_leaderboard()
 
     def get_player(self,nick):
-        return [p for p in self.players if p.nickname == nick][0]
+        p = [p for p in self.players if p.nickname == nick]
+        if p != []:
+            return p[0]
 
     def game_ended(self,player,result,opponent):
         self.set_new_score(player,result,opponent)
