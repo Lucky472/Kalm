@@ -143,7 +143,8 @@ class MyServer(Server):
         challenger.state = IN_GAME
         self.update_leaderboard()
         
-    def challenge_denied(self,challenged_player,challenger):
+    def challenge_denied(self,challenged_player,challenger_nickname):
+        challenger = self.get_player(challenger_nickname)
         challenger.Send({"action":"challenge_denied","opponent_nickname":challenged_player.nickname})
         challenger.state = IN_LOBBY
         challenged_player.state = IN_LOBBY

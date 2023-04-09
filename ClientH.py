@@ -197,12 +197,12 @@ class ClientWindow(Tk):
         """
         self.client.Send({"action":"new_game_request","challenged":opponent_nickname})
 
-    def challenge_denied(opponent):
+    def challenge_denied(self,opponent):
         """
         opponent est un string
         informe le joueur que le défi a été refusé
         """
-        boxedmessage.showinfo(title=None, message="TU AS ÉTÉ REJETÉ PAR" + opponent)
+        boxedmessage.showinfo(title=None, message="TU AS ÉTÉ REJETÉ PAR " + opponent)
 
         
     def launch_game(self,my_pawn,opponent_pawn,my_color,opponent_color,my_nickname,opponent_nickname):
@@ -314,7 +314,6 @@ class Controller:
                     else:
                         boxedmessage.showinfo(title=None, message="TU PEUX PAS LE METTRE LA !")
             if (self.move == PLACE_WALL_ACROSS)and (self.view.my_walls > 0): 
-                print("clic side")
                 hole = self.detect_clicked_hole(evt.x,evt.y)
                 if (hole != None):
                     if self.model.test_add_wall((hole[0],hole[1]),"ACROSS"):
@@ -625,13 +624,10 @@ class Model :
             return False
         if orientation == "UP":
             if self.board[x][y-1].occupied or self.board[x][y].occupied or self.board[x][y+1].occupied :
-                print("faux car occupé")
                 return False
         if orientation == "ACROSS":
             if self.board[x-1][y].occupied or self.board[x][y].occupied or self.board[x+1][y].occupied :
-                print("faux car occupé")
                 return False
-        print("on fait le pathfind")
         return self.pathfind_test_with_wall(location,orientation)
     
     def accessible_from(self,location,avoid = None):
@@ -681,7 +677,6 @@ class Model :
             else :
                 test = test and (self.pathfind_test(pawn.coords, BOARD_Y_LENGTH-1))
         self.remove_wall(location, orientation)
-        print(test)
         return test
     
     def pathfind_test(self,location,targeted_y,all_accessibles=[],new_accessibles=[]):
