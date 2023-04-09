@@ -84,6 +84,7 @@ class MyServer(Server):
             player.Send({"action":"connexion_accepted"})
             self.players[player] = True
             print(nickname + " connexion accepted")
+            self.update_leaderboard()
         else :
             player.Send({"action":"connexion_denied"})
             print(nickname + " connexion rejected")
@@ -120,6 +121,7 @@ class MyServer(Server):
                 player2.state = IN_CHALLENGE
         else :
             challenger.Send({"action":"cannot_challenge","opponent_nickname":player2.nickname})
+        self.update_leaderboard()
     
     def can_challenge(self,challenger,player2):
         """
@@ -138,11 +140,13 @@ class MyServer(Server):
         challenger.Send({"action":"launch_game","your_pawn":"DOWN","opponent_pawn":"UP","your_color":challenger.color,"opponent_color":player2.color})
         player2.state = IN_GAME
         challenger.state = IN_GAME
+        self.update_leaderboard()
         
     def challenge_denied(self,challenged_player,challenger):
         challenger.Send({"action":"challenge_denied","opponent_nickname":challenged_player.nickname})
         challenger.state = IN_LOBBY
         challenged_player.state = IN_LOBBY
+        self.update_leaderboard()
 
     def get_player(self,nick):
         return [p for p in self.players if p.nickname == nick][0]
@@ -151,6 +155,7 @@ class MyServer(Server):
         self.set_new_score(player,result,opponent)
         player.state = IN_LOBBY
         player.Send({"action":"close_game"})
+        self.update_leaderboard()
         
     def set_new_score(self,player,result,opponent):
         old_score = player.score
@@ -160,7 +165,13 @@ class MyServer(Server):
         else :
             player.score = old_score - (100 - (1/3)*(old_score - opponent_score))
 
-
+    def update_leaderboard(self):
+        leaderboard = []
+        for player in self.players :
+            player_dict = {"nickname":player.nickname,"score":self.player.score,"state":player.state,"color":player.color}
+            leaderboard.append(player_dict)
+        self.SendToAll({"action":"update_leaderboard","leaderboard":leaderboard})
+            
 
 # get command line argument of server, port
 if len(sys.argv) != 2:

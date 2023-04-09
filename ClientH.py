@@ -227,7 +227,7 @@ class ClientWindow(Tk):
     
     def afficher_liste_joueur(self,Liste_joueur):
         for i in range(len(Liste_joueur)-2,-1,-2):
-            self.L_joueur=Label(self.f_liste,text=Liste_joueur[i]+" "+ str(Liste_joueur[i+1]),font=(FONT,10),bg='#4065A4',fg='black',bd=2,relief=SUNKEN)
+            self.L_joueur=Label(self.f_liste,text=Liste_joueur[i]+" "+ str(Liste_joueur[i+1])+" "+ str(Liste_joueur[i+2]),font=(FONT,10),bg='#4065A4',fg='black',bd=2,relief=SUNKEN)
             self.L_joueur.pack(pady=0,fill=X)
     
     def defy_tournament(self,evt):
@@ -286,6 +286,7 @@ class Controller:
             if (self.move == PLACE_WALL_UP): 
                 print("clic up")
                 hole = self.detect_clicked_hole(evt.x,evt.y)
+                print(hole)
                 if (hole != None):
                     if self.model.test_add_wall((hole[0],hole[1]),"UP"):
                         self.controller_place_wall((hole[0],hole[1]),"UP")
@@ -460,10 +461,12 @@ class View:
         self.pawns[pawn_id] = self.draw_pawn(x,y,color)
     
     def place_wall(self,x,y,orientation):
-            if orientation == PLACE_WALL_ACROSS:
-                self.place_horizontal_wall(x,y)
-            elif orientation == PLACE_WALL_UP:
-                self.place_vertical_wall(x,y)
+        new_x = x // 2 +1
+        new_y = y // 2 +1
+        if orientation == PLACE_WALL_ACROSS:
+            self.place_horizontal_wall(new_x,new_y)
+        elif orientation == PLACE_WALL_UP:
+            self.place_vertical_wall(new_x,new_y)
 
     def show_plays(self,playable_list):
         """
