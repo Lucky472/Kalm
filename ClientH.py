@@ -69,10 +69,10 @@ class Client(ConnectionListener):
     def Network_connected(self, data):
         print("You are now connected to the server")
     
-    def Network_connexion_accepted(self):
+    def Network_connexion_accepted(self,data):
         self.window.show_tournament()
     
-    def Network_connexion_denied(self):
+    def Network_connexion_denied(self,data):
         #dit au jouerur que la connexion a été refusée pour cause de mauvais pseudo
         sleep(2)
         self.window.destroy()
