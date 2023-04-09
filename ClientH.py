@@ -138,7 +138,7 @@ class Client(ConnectionListener):
 class ClientWindow(Tk):
     def __init__(self, host, port,color,nickname):
         Tk.__init__(self)
-        self.geometry("840x840")
+        self.geometry("840x520")
         self.configure(bg=BACKGROUNDCOLOR)
         self.client = Client(host, int(port), self,color,nickname)
         self.controller = None
@@ -440,7 +440,13 @@ class View:
         self.opponent_pawn = opponent_pawn
         self.color = color 
         self.opponent_color = opponent_color
-        self.deletable_dots = []        
+        self.deletable_dots = []
+
+        self.my_walls = IntVar()
+        self.my_walls.set(7)
+        self.opponent_walls = IntVar()
+        self.opponent_walls.set(7)   
+
         self.frame_buttons()
         self.frame_labels()
         self.buttons()
@@ -459,9 +465,9 @@ class View:
         self.L_name_right = Label(self.f_labels, text = self.controller.opponent_nickname)
     
     def walls_left_labels(self):
-        self.L_wall_left = Label(self.f_labels, textvariable = self.controller.my_walls)
+        self.L_wall_left = Label(self.f_labels, textvariable = self.my_walls)
         self.L_wall_middle = Label(self.f_labels, text = "WALLS LEFT" + " ")
-        self.L_wall_right = Label(self.f_labels, textvariable = self.controller.opponent_walls)
+        self.L_wall_right = Label(self.f_labels, textvariable = self.opponent_walls)
 
     def frame_buttons(self):
         self.f_buttons = Frame(self.window, width = WIDTHFRAME, height = HEIGHTFRAME)
