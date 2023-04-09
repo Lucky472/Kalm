@@ -144,10 +144,12 @@ class ClientWindow(Tk):
         self.afficher_liste_joueur(self.trier_liste(self.dico_list))
 
     def set_tournament(self):
+        self.bind('<Enter>',self.defy_tournament)
         self.text_tournament()
         self.pack_tournament()
 
     def unset_tournament(self):
+        self.unbind('<Enter>')
         self.frame.destroy()
         self.f_affichage_liste.destroy()
         self.f_adversaire.destroy()
