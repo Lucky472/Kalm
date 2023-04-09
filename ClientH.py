@@ -138,7 +138,7 @@ class Client(ConnectionListener):
 class ClientWindow(Tk):
     def __init__(self, host, port,color,nickname):
         Tk.__init__(self)
-        self.geometry("520x500")
+        self.geometry("1280x720")
         self.configure(bg=BACKGROUNDCOLOR)
         self.client = Client(host, int(port), self,color,nickname)
         self.controller = None
@@ -209,7 +209,8 @@ class ClientWindow(Tk):
         self.controller = Controller(self,self.client,my_pawn,opponent_pawn,my_color,opponent_color,my_nickname,opponent_nickname)
 
     def unpack_game(self):
-        self.controller.view.unpack_all()   
+        self.controller.view.unpack_all() 
+        self.controller.view.f_labels.destroy()  
         self.controller = None
 
     def pack_tournament(self):
@@ -325,7 +326,7 @@ class Controller:
     
     def board_click(self,evt):
         if (self.state == ACTIVE):
-            if (self.move == PLACE_WALL_UP) and (self.my_walls > 0): 
+            if (self.move == PLACE_WALL_UP) and (self.my_walls.get() > 0): 
                 hole = self.detect_clicked_hole(evt.x,evt.y)
                 if (hole != None):
                     if self.model.test_add_wall((hole[0],hole[1]),"UP"):
@@ -334,7 +335,7 @@ class Controller:
                         self.my_walls.set(self.my_walls.get()-1)
                     else:
                         boxedmessage.showinfo(title=None, message="TU PEUX PAS LE METTRE LA !")
-            if (self.move == PLACE_WALL_ACROSS)and (self.my_walls > 0): 
+            if (self.move == PLACE_WALL_ACROSS)and (self.my_walls.get() > 0): 
                 print("clic side")
                 hole = self.detect_clicked_hole(evt.x,evt.y)
                 if (hole != None):
