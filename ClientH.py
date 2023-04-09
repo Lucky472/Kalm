@@ -31,7 +31,7 @@ PIXEL_BOARD_Y_LENGTH = Y_AXIS_LENGTH * SIZESQUARE
 X_OFFSET = 10
 Y_OFFSET = 10
 SPACING = 4
-
+INITWALL = 7
 HOST, PORT = "localhost", "31425"
 NICKNAME = "nick"
 BASECOLOR = "#ca7511"
@@ -100,6 +100,7 @@ class Client(ConnectionListener):
     
     def Network_placed_wall(self,data):
         self.window.controller.controller_place_wall(data["location"], data["orientation"])
+        self.window.controller.opponent_walls.set(self.opponent_walls.get()-1)
         self.window.controller.set_active()
         
     def Network_moved_pawn(self,data):
@@ -292,6 +293,11 @@ class Controller:
         self.state = INITIAL
         self.my_pawn = my_pawn
         self.opponent_pawn = opponent_pawn
+        self.my_walls = IntVar()
+        self.my_walls.set(INITWALL)
+        self.opponent_walls = IntVar()
+        self.opponent_walls.set(INITWALL)
+
         if self.my_pawn == "UP":
             self.set_active()
         else : 
@@ -305,27 +311,24 @@ class Controller:
     
     def board_click(self,evt):
         if (self.state == ACTIVE):
-            print("clic")
-            if (self.move == PLACE_WALL_UP): 
-                print("clic up")
+            if (self.move == PLACE_WALL_UP) and (self.my_walls != 0): 
                 hole = self.detect_clicked_hole(evt.x,evt.y)
-                print(hole)
                 if (hole != None):
                     if self.model.test_add_wall((hole[0],hole[1]),"UP"):
                         self.controller_place_wall((hole[0],hole[1]),"UP")
                         self.send_placed_wall((hole[0],hole[1]),"UP")
-            if (self.move == PLACE_WALL_ACROSS): 
-                print("clic side")
+                        self.my_walls.set(self.my_walls.get()-1)
+
+            if (self.move == PLACE_WALL_ACROSS) and (self.my_walls != 0): 
                 hole = self.detect_clicked_hole(evt.x,evt.y)
-                print(hole)
                 if (hole != None):
                     if self.model.test_add_wall((hole[0],hole[1]),"ACROSS"):
                         self.controller_place_wall((hole[0],hole[1]),"ACROSS")
                         self.send_placed_wall((hole[0],hole[1]),"ACROSS")
+                        self.my_walls.set(self.my_walls.get()-1)
+
             if self.move == MOVE_PAWN :
-                print("clic move")
                 square = self.detect_clicked_square(evt.x,evt.y)
-                print(square)
                 if square != None and square in self.model.accessible_from(self.model.pawns[self.my_pawn].coords):
                     self.controller_move_pawn(self.my_pawn, square)
                     self.send_moved_pawn(square)
@@ -417,7 +420,8 @@ class View:
         self.window = window
         self.canvas_board = Canvas(self.window,height = PIXEL_BOARD_Y_LENGTH + 2*Y_OFFSET,width =  PIXEL_BOARD_X_LENGTH + 2*X_OFFSET,bg =COLORBOARD )
         self.draw_board()
-        self.canvas_board.pack()
+        self.canvas_board.pack(side=TOP)        
+
         # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6) pour une taille de 7 cases
         if my_pawn == "UP":
             self.pawns = {opponent_pawn:self.draw_pawn(BOARD_X_LENGTH // 2,BOARD_Y_LENGTH-1 , opponent_color),my_pawn:self.draw_pawn(BOARD_X_LENGTH // 2, 0,color)}
@@ -427,7 +431,9 @@ class View:
         self.opponent_pawn = opponent_pawn
         self.color = color 
         self.opponent_color = opponent_color
-        self.deletable_dots = []
+        self.deletable_dots = []        
+        self.my_walls = self.controller.my_walls
+        self.opponent_walls = self.controller.opponent_walls
         self.frame_buttons()
         self.buttons()
         self.pack_buttons()
@@ -440,6 +446,13 @@ class View:
        self.B_horizontal_wall = Button(self.f_buttons, text = "Mur horizontal", command = self.controller.set_wall_horizontal)
        self.B_vertical_wall = Button(self.f_buttons, text = "Mur vertical", command = self.controller.set_wall_vertical)
     
+    def pack_labels(self):
+        self.f_labels.pack(side=TOP)
+        self.L_name_left.pack(side=LEFT, padx=PIXEL_BOARD_X_LENGTH//4,expand=YES)
+        self.L_name_right.pack(side=RIGHT, padx=PIXEL_BOARD_X_LENGTH//4, expand=YES)
+        self.L_wall_left.pack(side=LEFT)
+        self.L_wall_right.pack(side=RIGHT)
+        
     def pack_buttons(self):
         self.f_buttons.pack(side=BOTTOM)
         self.B_horizontal_wall.pack(side=LEFT)
