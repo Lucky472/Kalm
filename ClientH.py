@@ -24,7 +24,7 @@ WIDTHLINE = 4
 WIDTHFRAME = BOARD_X_LENGTH
 HEIGHTFRAME = BOARD_Y_LENGTH//4
 COLORLINE = "#D4D4D4"
-COLORWALL = "#AA5372"
+COLORWALL = "#4d8b2b"
 LENGTH_LINE = 10
 PIXEL_BOARD_X_LENGTH = X_AXIS_LENGTH * SIZESQUARE
 PIXEL_BOARD_Y_LENGTH = Y_AXIS_LENGTH * SIZESQUARE
@@ -113,7 +113,7 @@ class Client(ConnectionListener):
             self.Send({"action":"challenge_denied","opponent":data["opponent_nickname"]})
     
     def Network_launch_game(self,data):
-        self.window.launch_game(data["your_pawn"],data["opponent_pawn"],data["your_color"],data["opponent_color"])
+        self.window.launch_game(data["your_pawn"],data["opponent_pawn"],data["your_color"],data["opponent_color"],data["your_nickname"],data["opponent_nickname"])
     
     def Network_cannot_challenge(self,data):
         """
@@ -201,9 +201,9 @@ class ClientWindow(Tk):
         boxedmessage.showinfo(title=None, message="TU AS ÉTÉ REJETÉ PAR" + opponent)
 
         
-    def launch_game(self,my_pawn,opponent_pawn,my_color,opponent_color):
+    def launch_game(self,my_pawn,opponent_pawn,my_color,opponent_color,my_nickname,opponent_nickname):
         self.unset_tournament()
-        self.controller = Controller(self,self.client,my_pawn,opponent_pawn,my_color,opponent_color)
+        self.controller = Controller(self,self.client,my_pawn,opponent_pawn,my_color,opponent_color,my_nickname,opponent_nickname)
 
     def unpack_game(self):
         self.controller.view.unpack_all()   
@@ -212,7 +212,6 @@ class ClientWindow(Tk):
     def pack_tournament(self):
         self.frame.pack(pady=20)
         self.Label_liste.pack()
-        self.f_liste.pack(expand=YES,pady=30,padx=80)
         self.L_adversaire.pack()
         self.e_adversaire.pack()
         self.f_adversaire.pack()
@@ -226,9 +225,7 @@ class ClientWindow(Tk):
         self.L_adversaire=Label(self.frame,text='Choisis ton adversaire',font=(FONT,19),bg=BACKGROUNDCOLOR,fg='white')
         self.e_adversaire=Entry(self.f_adversaire,font=(FONT,20),bg='white',fg='black')
         self.B_jouer = Button(self,text='   Défier   ',command=self.defy_tournament ,bg='#4065A4')
-    
-   
-    
+
     def defy_tournament(self,evt):
         opponent = self.e_adversaire.get()
         if len(opponent) == 0:
@@ -281,7 +278,7 @@ class ClientWindow(Tk):
 
 
 class Controller:
-    def __init__(self,window,client,my_pawn,opponent_pawn,my_color,opponent_color):
+    def __init__(self,window,client,my_pawn,opponent_pawn,my_color,opponent_color,my_nickname,opponent_nickname):
         self.window = window
         self.client = client
         self.model = Model()
@@ -299,6 +296,9 @@ class Controller:
     
     def set_active(self):
         self.state = ACTIVE
+        if self.move == MOVE_PAWN:
+            x,y = self.model.pawns[self.my_pawn].coords
+            self.view.show_plays(self.model.accessible_from((x,y)))
         
     def set_inactive(self):
         self.state = INACTIVE
@@ -314,6 +314,8 @@ class Controller:
                     if self.model.test_add_wall((hole[0],hole[1]),"UP"):
                         self.controller_place_wall((hole[0],hole[1]),"UP")
                         self.send_placed_wall((hole[0],hole[1]),"UP")
+                    else:
+                        boxedmessage.showinfo(title=None, message="TU PEUX PAS LE METTRE LA !")
             if (self.move == PLACE_WALL_ACROSS): 
                 print("clic side")
                 hole = self.detect_clicked_hole(evt.x,evt.y)
@@ -322,6 +324,8 @@ class Controller:
                     if self.model.test_add_wall((hole[0],hole[1]),"ACROSS"):
                         self.controller_place_wall((hole[0],hole[1]),"ACROSS")
                         self.send_placed_wall((hole[0],hole[1]),"ACROSS")
+                    else:
+                        boxedmessage.showinfo(title=None, message="TU PEUX PAS LE METTRE LA !")
             if self.move == MOVE_PAWN :
                 print("clic move")
                 square = self.detect_clicked_square(evt.x,evt.y)
@@ -767,8 +771,6 @@ class Menu :
         else :
             boxedmessage.showinfo(title=None, message="CHANGE TON PSEUDO ! ET NE MET PAS LE VIDE !") 
 
- 
-    
     def change_color(self):
         colors=askcolor(title="Tkinter Color Chooser")
         self.Window.configure(bg=colors[1])
