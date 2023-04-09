@@ -146,7 +146,11 @@ class ClientWindow(Tk):
         #self.afficher_liste_joueur(self.trier_liste(self.dico_list))
         self.f_affichage_liste=Frame(self,bg='white',bd=2,relief=SUNKEN)
         self.f_affichage_liste.pack(expand=YES, side=RIGHT)
-        
+        self.L_joueur = []
+        self.Label_liste=Label(self.f_affichage_liste,text='Classement joueurs',font=(FONT,10),bg='white',fg ='black')
+        self.Label_liste.pack()
+        self.f_liste = Frame(self.f_affichage_liste,bg='white')
+    
     def set_tournament(self):
         self.bind('<Return>',self.defy_tournament)
         self.text_tournament()
@@ -212,7 +216,6 @@ class ClientWindow(Tk):
 
     def pack_tournament(self):
         self.frame.pack(pady=20)
-        self.Label_liste.pack()
         self.L_adversaire.pack()
         self.e_adversaire.pack()
         self.f_adversaire.pack()
@@ -220,8 +223,6 @@ class ClientWindow(Tk):
     
     def text_tournament(self):
         self.frame=Frame(self,bg=BACKGROUNDCOLOR)
-        self.Label_liste=Label(self.f_affichage_liste,text='Classement joueurs',font=(FONT,10),bg='white',fg ='black')
-        self.f_liste=Frame(self.f_affichage_liste,bg='white')
         self.f_adversaire=Frame(self.frame,bg=BACKGROUNDCOLOR)
         self.L_adversaire=Label(self.frame,text='Choisis ton adversaire',font=(FONT,19),bg=BACKGROUNDCOLOR,fg='white')
         self.e_adversaire=Entry(self.f_adversaire,font=(FONT,20),bg='white',fg='black')
@@ -264,11 +265,13 @@ class ClientWindow(Tk):
     def afficher_liste_joueur(self,liste_joueur):
         for player in liste_joueur:
             state = self.string_state(player["state"])
-            self.L_joueur=Label(self.f_liste,text=player["nickname"]+" "+ str(player["score"])+" "+ state,font=(FONT,10),bg='#4065A4',fg='black',bd=2,relief=SUNKEN)
-            self.L_joueur.pack(pady=0,fill=X)
+            self.L_joueur.append(Label(self.f_liste,text=player["nickname"]+" "+ str(player["score"])+" "+ state,font=(FONT,10),bg='#4065A4',fg='black',bd=2,relief=SUNKEN))
+            self.L_joueur[-1].pack(pady=0,fill=X)
 
     def update_leaderboard(self,leaderboard):
         leaderboard = self.sorted_leaderboard(leaderboard)
+        for joueur in self.L_joueur :
+            joueur.destroy()
         self.f_liste.destroy()
         self.f_liste = Frame(self.f_affichage_liste,bg='white')
         self.f_liste.pack(expand=YES,pady=30,padx=80)
