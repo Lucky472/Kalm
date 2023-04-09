@@ -33,7 +33,7 @@ class ClientChannel(Channel):
         data["who"] = self.opponent.nickname
         data["action"] = data["sent_action"]
         new_data = {key:data[key] for key in data if key != "sent_action"}
-        self.SendTo(new_data)
+        self._server.SendTo(new_data)
         
     def Network_send_to_all(self,data):
         self.SendToAll(data)
@@ -56,10 +56,10 @@ class ClientChannel(Channel):
     def Network_challenge_denied(self,data):
         self._server.challenge_denied(self,data["opponent"])
 
-    def Network_i_won(self):
+    def Network_i_won(self,data):
         self._server.game_ended(self, WON, self.opponent)
 
-    def Network_i_lost(self):
+    def Network_i_lost(self,data):
         self._server.game_ended(self, LOST, self.opponent)
 
 class MyServer(Server):
@@ -132,9 +132,6 @@ class MyServer(Server):
         return abs(challenger.score - player2.score) < 200
     
     def launch_game(self,challenger,player2):
-        print("début lanch game")
-        print(challenger)
-        print(player2)
         player2.opponent = challenger
         challenger.opponent = player2
         player2.Send({"action":"launch_game","your_pawn":"UP","opponent_pawn":"DOWN","your_color":player2.color,"opponent_color":challenger.color})
@@ -148,9 +145,6 @@ class MyServer(Server):
         challenged.state = IN_LOBBY
 
     def get_player(self,nick):
-        print("début de l'execution")
-        print(nick)
-        print([p for p in self.players if p.nickname == nick][0])
         return [p for p in self.players if p.nickname == nick][0]
 
     def game_ended(self,player,result,opponent):
