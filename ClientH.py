@@ -200,6 +200,7 @@ class ClientWindow(Tk):
 
         
     def launch_game(self,my_pawn,opponent_pawn,my_color,opponent_color):
+        self.unset_tournament()
         self.controller = Controller(self,self.client,my_pawn,opponent_pawn,my_color,opponent_color)
 
     def unpack_game(self):
@@ -493,7 +494,6 @@ class View:
             boxedmessage.showinfo(title=None, message="TU AS PERDU ... ")
             
     def unpack_all(self):
-        self.canvas_board.delete("all")
         self.canvas_board.destroy()
         self.f_buttons.destroy()
         self.B_horizontal_wall.destroy()
