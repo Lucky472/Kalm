@@ -52,11 +52,11 @@ OPPONENT = 1
 class Client(ConnectionListener):
     def __init__(self, host, port, window,color,nickname):
         self.window = window
-        self.Connect((host, port))
         self.color = color
         self.nickname = nickname
         self.oponent_color = "#f3f300"
         self.state=INITIAL
+        self.Connect((host, port))
         print("Client started")
         print("Ctrl-C to exit")
 
@@ -77,7 +77,6 @@ class Client(ConnectionListener):
         sleep(2)
         self.window.destroy()
         self.state = DEAD
-        exit()
     
     def Loop(self):
         connection.Pump()
@@ -97,7 +96,7 @@ class Client(ConnectionListener):
     
     def Network_disconnected(self, data):
         print('Server disconnected')
-        exit()
+        self.window.destroy()
     
     def Network_placed_wall(self,data):
         self.window.controller.controller_place_wall(data["location"], data["orientation"])

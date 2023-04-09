@@ -26,7 +26,7 @@ class ClientChannel(Channel):
         self.nickname = data["nickname"]
         self.color = data["color"]
         self.score = BASE_SCORE
-        self.state = IN_LOBBY
+        self.state = IN_LOBBY        
         self._server.am_i_allowed(self,self.nickname)
     
     def Network_send_to_opponent(self,data):
@@ -81,8 +81,11 @@ class MyServer(Server):
         if nickname not in self.players:
             player.Send({"action":"connexion_accepted"})
             self.players[player] = True
+            print(nickname + " connexion accepted")
         else :
             player.Send({"action":"connexion_denied"})
+            print(nickname + " connexion rejected")
+            
     def PrintPlayers(self):
         print("players' nicknames :",[p.nickname for p in self.players])
   
@@ -128,8 +131,10 @@ class MyServer(Server):
         
         return abs(challenger.score - player2.score) < 200
     
-    def launch_game(self,challenger_nick,player2):
-        challenger = self.get_player(challenger_nick)
+    def launch_game(self,challenger,player2):
+        print("début lanch game")
+        print(challenger)
+        print(player2)
         player2.opponent = challenger
         challenger.opponent = player2
         player2.Send({"action":"launch_game","your_pawn":"UP","opponent_pawn":"DOWN","your_color":player2.color,"opponent_color":challenger.color})
@@ -143,6 +148,9 @@ class MyServer(Server):
         challenged.state = IN_LOBBY
 
     def get_player(self,nick):
+        print("début de l'execution")
+        print(nick)
+        print([p for p in self.players if p.nickname == nick][0])
         return [p for p in self.players if p.nickname == nick][0]
 
     def game_ended(self,player,result,opponent):
