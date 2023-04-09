@@ -148,6 +148,12 @@ class ClientWindow(Tk):
         self.text_tournament()
         self.pack_tournament()
 
+    def unset_tournament(self):
+        self.frame.destroy()
+        self.f_affichage_liste.destroy()
+        self.f_adversaire.destroy()
+        self.B_jouer.destroy()
+
     def myMainLoop(self):
         while self.client.state!=DEAD:   
             self.update()
@@ -209,7 +215,7 @@ class ClientWindow(Tk):
     def text_tournament(self):
         self.frame=Frame(self,bg=BACKGROUNDCOLOR)
         self.f_affichage_liste=Frame(self,bg='white',bd=2,relief=SUNKEN)
-        self.Label_liste=Label(self.f_affichage_liste,text='Classement joueurs',font=(FONT,10),bg='white,fg='black')
+        self.Label_liste=Label(self.f_affichage_liste,text='Classement joueurs',font=(FONT,10),bg='white',fg ='black')
         self.f_liste=Frame(self.f_affichage_liste,bg='white')
         self.f_adversaire=Frame(self.frame,bg=BACKGROUNDCOLOR)
         self.L_adversaire=Label(self.frame,text='Choisis ton adversaire',font=(FONT,19),bg=BACKGROUNDCOLOR,fg='white')
