@@ -101,7 +101,7 @@ class Client(ConnectionListener):
     def Network_placed_wall(self,data):
         self.window.controller.controller_place_wall(data["location"], data["orientation"])
         self.window.controller.view.opponent_walls -= 1
-        self.view.L_wall_right.configure["text"] = self.view.opponent_walls
+        self.window.controller.view.L_wall_right.configure(text = str(self.window.controller.view.opponent_walls)) 
         self.window.controller.set_active()
         
     def Network_moved_pawn(self,data):
@@ -310,7 +310,7 @@ class Controller:
                         self.controller_place_wall((hole[0],hole[1]),"UP")
                         self.send_placed_wall((hole[0],hole[1]),"UP")
                         self.view.my_walls -= 1
-                        self.view.L_wall_left.configure["text"] = self.view.my_walls
+                        self.view.L_wall_left.configure(text = str(self.view.my_walls))
                     else:
                         boxedmessage.showinfo(title=None, message="TU PEUX PAS LE METTRE LA !")
             if (self.move == PLACE_WALL_ACROSS)and (self.view.my_walls > 0): 
@@ -321,7 +321,8 @@ class Controller:
                         self.controller_place_wall((hole[0],hole[1]),"ACROSS")
                         self.send_placed_wall((hole[0],hole[1]),"ACROSS")
                         self.view.my_walls -= 1
-                        self.view.L_wall_left.configure["text"] = self.view.my_walls
+                        self.view.L_wall_left.configure(text = str(self.view.my_walls))
+
             if self.move == MOVE_PAWN :
                 square = self.detect_clicked_square(evt.x,evt.y)
                 if square != None and square in self.model.accessible_from(self.model.pawns[self.my_pawn].coords):
@@ -450,7 +451,7 @@ class View:
     def walls_left_labels(self):
         self.L_wall_left = Label(self.f_labels, text = self.my_walls)
         self.L_wall_middle = Label(self.f_labels, text = "WALLS LEFT" + " ")
-        self.L_wall_right = Label(self.f_labels, text = self.opponent_walls)
+        self.L_wall_right = Label(self.f_labels, text = str(self.opponent_walls))
 
     def frame_buttons(self):
         self.f_buttons = Frame(self.window, width = WIDTHFRAME, height = HEIGHTFRAME)
