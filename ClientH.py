@@ -211,7 +211,8 @@ class ClientWindow(Tk):
         self.controller = Controller(self,self.client,my_pawn,opponent_pawn,my_color,opponent_color,my_nickname,opponent_nickname)
 
     def unpack_game(self):
-        self.controller.view.unpack_all()   
+        self.controller.view.unpack_all() 
+        self.controller.view.f_labels.destroy()  
         self.controller = None
 
     def pack_tournament(self):
