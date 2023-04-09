@@ -107,10 +107,10 @@ class Client(ConnectionListener):
         self.window.controller.set_active()
         
     def Network_challenge(self,data):
-        if self.window.ask_challenge(data["opponent"]):
-            self.Send({"action":"challenge_accepted","challenged":self.nickname,"opponent":data["opponent"]})
+        if self.window.ask_challenge(data["opponent_nickname"]):
+            self.Send({"action":"challenge_accepted","challenged":self.nickname,"opponent_nickname":data["opponent_nickname"]})
         else :
-            self.Send({"action":"challenge_denied","opponent":data["opponent"]})
+            self.Send({"action":"challenge_denied","opponent":data["opponent_nickname"]})
     
     def Network_launch_game(self,data):
         self.window.launch_game(data["your_pawn"],data["opponent_pawn"],data["your_color"],data["opponent_color"])
@@ -120,10 +120,10 @@ class Client(ConnectionListener):
         indique au joueur que il ne peut pas défier le joueur
         (data["opponent"]) est le joueur ne pouvant pas être défié
         """
-        boxedmessage.showinfo(title=None, message="Le joueur: "+str(data["opponent"]+" ne peut pas être défié"))
+        boxedmessage.showinfo(title=None, message="Le joueur: "+data["opponent_nickname"]+" ne peut pas être défié")
     
     def Network_challenge_denied(self,data):
-        self.window.challenge_denied(data["opponent"])
+        self.window.challenge_denied(data["opponent_nickname"])
         
     def Network_close_game(self,data):
         self.window.show_tournament()
@@ -172,14 +172,13 @@ class ClientWindow(Tk):
             self.set_tournament()
 
 
-    def ask_challenge(self,opponent):
+    def ask_challenge(self,opponent_nickname):
         """
-        opponent est l'instance de classe avec tt les attributs du challenger
         demande au joueur si il accepte le défi lancé par un joueur tiers
         (si oui, return True
          si non, return False)
         """ 
-        answer = boxedmessage.askyesno(title = "Défi de "+ str(opponent.nickname),message =str(opponent.nickname)+" vous défie, voulez vous accepter ?")
+        answer = boxedmessage.askyesno(title = "Défi de "+ str(opponent_nickname),message =str(opponent_nickname)+" vous défie, voulez vous accepter ?")
         if answer == YES:
             return True
         return False
@@ -192,10 +191,10 @@ class ClientWindow(Tk):
 
     def challenge_denied(opponent):
         """
-        opponent est l'instance de classe avec tt les attributs du challenger
+        opponent est un string
         informe le joueur que le défi a été refusé
         """
-        boxedmessage.showinfo(title=None, message="TU AS ÉTÉ REJETÉ")
+        boxedmessage.showinfo(title=None, message="TU AS ÉTÉ REJETÉ PAR" + opponent)
 
         
     def launch_game(self,my_pawn,opponent_pawn,my_color,opponent_color):
@@ -325,9 +324,9 @@ class Controller:
                 self.view.show_winner(OPPONENT)
     
     def did_i_won(self):
-        if self.my_pawn == "UP" and self.model.pawns["UP"].coords[1] == 0:
+        if self.my_pawn == "DOWN" and self.model.pawns["DOWN"].coords[1] == 0:
             return True
-        if self.my_pawn == "DOWN" and self.model.pawns["DOWN"].coords[1] == Y_AXIS_LENGTH-1:
+        if self.my_pawn == "UP" and self.model.pawns["UP"].coords[1] == BOARD_Y_LENGTH-1:
             return True
         return False
     
@@ -338,7 +337,7 @@ class Controller:
         self.client.Send({"action":"i_won"})
     
     def test_end_game(self):
-        return (self.model.pawns["UP"].coords[1] == 0) or (self.model.pawns["DOWN"].coords[1] == Y_AXIS_LENGTH-1)
+        return (self.model.pawns["DOWN"].coords[1] == 0) or (self.model.pawns["UP"].coords[1] == BOARD_Y_LENGTH -1)
     
     def controller_place_wall(self,location,orientation):
         x,y = location
@@ -354,8 +353,8 @@ class Controller:
                 y_minus = y*SIZESQUARE + Y_OFFSET - LENGTH_LINE
                 y_maxus = (y)*SIZESQUARE + Y_OFFSET + LENGTH_LINE
                 if (pixel_x >= x_minus) and (pixel_x <= x_maxus):
-                    if (pixel_y >= y_minus) and (pixel_x <= y_maxus):
-                        return (x,y)
+                    if (pixel_y >= y_minus) and (pixel_y <= y_maxus):
+                        return (2*x -1, 2*y -1)
         return None
 
     def detect_clicked_square(self,pixel_x,pixel_y):
@@ -461,9 +460,9 @@ class View:
         self.pawns[pawn_id] = self.draw_pawn(x,y,color)
     
     def place_wall(self,x,y,orientation):
-            if type == PLACE_WALL_ACROSS:
+            if orientation == PLACE_WALL_ACROSS:
                 self.place_horizontal_wall(x,y)
-            elif type == PLACE_WALL_UP:
+            elif orientation == PLACE_WALL_UP:
                 self.place_vertical_wall(x,y)
 
     def show_plays(self,playable_list):
@@ -514,7 +513,7 @@ class View:
 class Model :
     def __init__(self):
         self.board = self.new_board()
-        self.pawns = {"DOWN":Pawn((BOARD_X_LENGTH // 2, 0)), "UP":Pawn((BOARD_X_LENGTH // 2, BOARD_Y_LENGTH -1))}
+        self.pawns = {"UP":Pawn((BOARD_X_LENGTH // 2, 0)), "DOWN":Pawn((BOARD_X_LENGTH // 2, BOARD_Y_LENGTH -1))}
     
     def new_board(self):
         board = [[0 for j in range(BOARD_Y_LENGTH)] for i in range(BOARD_X_LENGTH)]
@@ -568,16 +567,18 @@ class Model :
             return False
         if orientation == "UP":
             if self.board[x][y-1].occupied or self.board[x][y].occupied or self.board[x][y+1].occupied :
+                print("faux car occupé")
                 return False
         if orientation == "ACROSS":
             if self.board[x-1][y].occupied or self.board[x][y].occupied or self.board[x+1][y].occupied :
+                print("faux car occupé")
                 return False
+        print("on fait le pathfind")
         return self.pathfind_test_with_wall(location,orientation)
     
     def accessible_from(self,location,avoid = None):
         x,y = location
         accessible_squares = []
-        print(location)
         #aller à gauche
         if x != 0 :
             if not self.board[x-1][y].occupied:
@@ -614,12 +615,13 @@ class Model :
     
     def pathfind_test_with_wall(self,location,orientation):
         self.add_wall(location, orientation)
+        test = True
         for key in self.pawns:
             pawn = self.pawns[key]
-            if key == "UP":
-                test = self.pathfind_test(pawn.coords, 0)
+            if key == "DOWN":
+                test = test and (self.pathfind_test(pawn.coords, 0))
             else :
-                test = self.pathfind_test(pawn.coords, BOARD_Y_LENGTH)
+                test = test and (self.pathfind_test(pawn.coords, BOARD_Y_LENGTH-1))
         self.remove_wall(location, orientation)
         print(test)
         return test
