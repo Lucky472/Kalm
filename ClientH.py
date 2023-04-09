@@ -225,7 +225,7 @@ class ClientWindow(Tk):
         self.f_adversaire=Frame(self.frame,bg=BACKGROUNDCOLOR)
         self.L_adversaire=Label(self.frame,text='Choisis ton adversaire',font=(FONT,19),bg=BACKGROUNDCOLOR,fg='white')
         self.e_adversaire=Entry(self.f_adversaire,font=(FONT,20),bg='white',fg='black')
-        self.B_jouer = Button(self,text='   Défier   ',command=self.defy_tournament ,bg='#4065A4')
+        self.B_jouer = Button(self,text='   Défier   ',command= lambda: self.defy_tournament("dummy") ,bg='#4065A4')
 
     def defy_tournament(self,evt):
         opponent = self.e_adversaire.get()
@@ -234,28 +234,12 @@ class ClientWindow(Tk):
         else:
             list_nicknames = [p["nickname"] for p in self.leaderboard]
             if opponent in list_nicknames :
-                self.send_challenge(opponent)
+                if self.client.nickname != opponent:
+                    self.send_challenge(opponent)
+                else :
+                    boxedmessage.showinfo(title=None, message="TU PEUX PAS TE DEFIER TOUT SEUL GROS MALIN")
             else :
                 boxedmessage.showinfo(title=None, message="CE GARS N'EXISTE PAS")
-
-    """
-    def trier_liste(self,dico_list):
-        Liste_score_joueur=[]
-        for i in range(0,len(dico_list)):
-            a=dico_list[i]["score"]
-            Liste_score_joueur.append(a)
-        Liste_score_joueur.sort()
-
-        Liste_joueur=[]
-        for i in Liste_score_joueur:
-            for j in range(0,len(dico_list)):
-                if i==dico_list[j]["score"] and dico_list[j]["name"] not in Liste_joueur:
-                    a=dico_list[j]["name"]
-                    Liste_joueur.append(a)
-                    b=dico_list[j]["score"]
-                    Liste_joueur.append(b)
-        return Liste_joueur
-    """
 
     def string_state(self,state):
         if state == 0:
