@@ -444,8 +444,6 @@ class View:
         self.color = color 
         self.opponent_color = opponent_color
         self.deletable_dots = []        
-        self.my_walls = self.controller.my_walls
-        self.opponent_walls = self.controller.opponent_walls
         self.frame_buttons()
         self.frame_labels()
         self.buttons()
@@ -464,9 +462,9 @@ class View:
         self.L_name_right = Label(self.f_labels, text = self.controller.opponent_nickname)
     
     def walls_left_labels(self):
-        self.L_wall_left = Label(self.f_labels, textvariable = str(self.my_walls))
+        self.L_wall_left = Label(self.f_labels, textvariable = str(self.controller.my_walls))
         self.L_wall_middle = Label(self.f_labels, text = "WALLS LEFT" + " ")
-        self.L_wall_right = Label(self.f_labels, textvariable = str(self.opponent_walls))
+        self.L_wall_right = Label(self.f_labels, textvariable = str(self.controller.opponent_walls))
 
     def frame_buttons(self):
         self.f_buttons = Frame(self.window, width = WIDTHFRAME, height = HEIGHTFRAME)
