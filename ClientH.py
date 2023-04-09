@@ -128,7 +128,10 @@ class Client(ConnectionListener):
     def Network_close_game(self,data):
         self.window.show_tournament()
         
-        
+    def Network_update_leaderboard(self,data):
+        self.window.update_leaderboard(data["leaderboard"])
+    
+    
 #########################################################
 
 class ClientWindow(Tk):
@@ -140,7 +143,9 @@ class ClientWindow(Tk):
         self.controller = None
         self.dico_list=[{"name":"matteo","score":2},{"name":"killian","score":13},{"name":"adrien","score":12},{"name":"lucas","score":4}]
         #self.afficher_liste_joueur(self.trier_liste(self.dico_list))
-
+        self.f_affichage_liste=Frame(self,bg='white',bd=2,relief=SUNKEN)
+        self.f_affichage_liste.pack(expand=YES, side=RIGHT)
+        
     def set_tournament(self):
         self.bind('<Return>',self.defy_tournament)
         self.text_tournament()
@@ -149,7 +154,6 @@ class ClientWindow(Tk):
     def unset_tournament(self):
         self.unbind('<Return>')
         self.frame.destroy()
-        self.f_affichage_liste.destroy()
         self.f_adversaire.destroy()
         self.B_jouer.destroy()
 
@@ -207,7 +211,6 @@ class ClientWindow(Tk):
 
     def pack_tournament(self):
         self.frame.pack(pady=20)
-        self.f_affichage_liste.pack(expand=YES)
         self.Label_liste.pack()
         self.f_liste.pack(expand=YES,pady=30,padx=80)
         self.L_adversaire.pack()
@@ -217,7 +220,6 @@ class ClientWindow(Tk):
     
     def text_tournament(self):
         self.frame=Frame(self,bg=BACKGROUNDCOLOR)
-        self.f_affichage_liste=Frame(self,bg='white',bd=2,relief=SUNKEN)
         self.Label_liste=Label(self.f_affichage_liste,text='Classement joueurs',font=(FONT,10),bg='white',fg ='black')
         self.f_liste=Frame(self.f_affichage_liste,bg='white')
         self.f_adversaire=Frame(self.frame,bg=BACKGROUNDCOLOR)
@@ -225,10 +227,7 @@ class ClientWindow(Tk):
         self.e_adversaire=Entry(self.f_adversaire,font=(FONT,20),bg='white',fg='black')
         self.B_jouer = Button(self,text='   Défier   ',command=self.defy_tournament ,bg='#4065A4')
     
-    def afficher_liste_joueur(self,Liste_joueur):
-        for i in range(len(Liste_joueur)-2,-1,-2):
-            self.L_joueur=Label(self.f_liste,text=Liste_joueur[i]+" "+ str(Liste_joueur[i+1])+" "+ str(Liste_joueur[i+2]),font=(FONT,10),bg='#4065A4',fg='black',bd=2,relief=SUNKEN)
-            self.L_joueur.pack(pady=0,fill=X)
+   
     
     def defy_tournament(self,evt):
         opponent = self.e_adversaire.get()
@@ -237,10 +236,8 @@ class ClientWindow(Tk):
         else:
             self.send_challenge(opponent)  
 
+    """
     def trier_liste(self,dico_list):
-        """
-            Prend le dico_list et le trie pour qu'il soit affichable
-        """
         Liste_score_joueur=[]
         for i in range(0,len(dico_list)):
             a=dico_list[i]["score"]
@@ -256,6 +253,32 @@ class ClientWindow(Tk):
                     b=dico_list[j]["score"]
                     Liste_joueur.append(b)
         return Liste_joueur
+    """
+
+    def string_state(self,state):
+        if state == 0:
+            return "en attente"
+        if state == 1:
+            return "en partie"
+        if state == 2:
+            return "en attente de défi"
+
+    def afficher_liste_joueur(self,liste_joueur):
+        for player in liste_joueur:
+            state = self.string_state(player["state"])
+            self.L_joueur=Label(self.f_liste,text=player["nickname"]+" "+ str(player["score"])+" "+ state,font=(FONT,10),bg='#4065A4',fg='black',bd=2,relief=SUNKEN)
+            self.L_joueur.pack(pady=0,fill=X)
+
+    def update_leaderboard(self,leaderboard):
+        leaderboard = self.sorted_leaderboard(leaderboard)
+        self.f_liste.destroy()
+        self.f_liste = Frame(self.f_affichage_liste,bg='white')
+        self.f_liste.pack(expand=YES,pady=30,padx=80)
+        self.afficher_liste_joueur(leaderboard)
+        
+    def sorted_leaderboard(self,leaderboard):
+        return sorted(leaderboard, key=lambda x: x["score"],reverse=True)
+
 
 class Controller:
     def __init__(self,window,client,my_pawn,opponent_pawn,my_color,opponent_color):
@@ -342,7 +365,7 @@ class Controller:
     
     def controller_place_wall(self,location,orientation):
         x,y = location
-        self.view.place_wall(x,y,self.move)  
+        self.view.place_wall(x,y,orientation)  
         self.model.add_wall((x,y),orientation)
         self.state = INACTIVE
     
@@ -463,9 +486,9 @@ class View:
     def place_wall(self,x,y,orientation):
         new_x = x // 2 +1
         new_y = y // 2 +1
-        if orientation == PLACE_WALL_ACROSS:
+        if orientation == "ACROSS":
             self.place_horizontal_wall(new_x,new_y)
-        elif orientation == PLACE_WALL_UP:
+        elif orientation == "UP":
             self.place_vertical_wall(new_x,new_y)
 
     def show_plays(self,playable_list):

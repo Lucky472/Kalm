@@ -161,14 +161,14 @@ class MyServer(Server):
         old_score = player.score
         opponent_score= opponent.score
         if result == WON :
-            player.score = old_score + (100 - (1/3)*(old_score - opponent_score))
+            player.score = old_score + (100 - (old_score - opponent_score)//3)
         else :
-            player.score = old_score - (100 - (1/3)*(old_score - opponent_score))
+            player.score = old_score - (100 - (old_score - opponent_score)//3)
 
     def update_leaderboard(self):
         leaderboard = []
         for player in self.players :
-            player_dict = {"nickname":player.nickname,"score":self.player.score,"state":player.state,"color":player.color}
+            player_dict = {"nickname":player.nickname,"score":player.score,"state":player.state,"color":player.color}
             leaderboard.append(player_dict)
         self.SendToAll({"action":"update_leaderboard","leaderboard":leaderboard})
             
