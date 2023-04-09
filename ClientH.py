@@ -169,7 +169,7 @@ class ClientWindow(Tk):
             self.unpack_game()
             self.set_tournament()
         else:
-            self.set_tournament
+            self.set_tournament()
 
 
     def ask_challenge(self,opponent):
@@ -264,7 +264,7 @@ class Controller:
         self.client = client
         self.model = Model()
         #LE CONTROLLEUR DOIT FOURNIR LA COULEUR DU JOUEUR PUIS LA COULEUR DE L'ADVERSAIRE
-        self.view = View(window)
+        self.view = View(window,my_pawn,opponent_pawn,my_color,opponent_color)
         self.view.canvas_board.bind("<Button-1>",self.board_click)
         self.move = MOVE_PAWN
         self.state = INITIAL

@@ -132,9 +132,6 @@ class MyServer(Server):
         return abs(challenger.score - player2.score) < 200
     
     def launch_game(self,challenger,player2):
-        print("début lanch game")
-        print(challenger)
-        print(player2)
         player2.opponent = challenger
         challenger.opponent = player2
         player2.Send({"action":"launch_game","your_pawn":"UP","opponent_pawn":"DOWN","your_color":player2.color,"opponent_color":challenger.color})
@@ -148,9 +145,6 @@ class MyServer(Server):
         challenged.state = IN_LOBBY
 
     def get_player(self,nick):
-        print("début de l'execution")
-        print(nick)
-        print([p for p in self.players if p.nickname == nick][0])
         return [p for p in self.players if p.nickname == nick][0]
 
     def game_ended(self,player,result,opponent):
