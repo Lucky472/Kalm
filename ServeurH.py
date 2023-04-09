@@ -136,8 +136,8 @@ class MyServer(Server):
     def launch_game(self,challenger,player2):
         player2.opponent = challenger
         challenger.opponent = player2
-        player2.Send({"action":"launch_game","your_pawn":"UP","opponent_pawn":"DOWN","your_color":player2.color,"opponent_color":challenger.color})
-        challenger.Send({"action":"launch_game","your_pawn":"DOWN","opponent_pawn":"UP","your_color":challenger.color,"opponent_color":player2.color})
+        player2.Send({"action":"launch_game","your_pawn":"UP","opponent_pawn":"DOWN","your_color":player2.color,"opponent_color":challenger.color,"your_nickname":player2.nickname,"opponent_nickname":challenger.nickname})
+        challenger.Send({"action":"launch_game","your_pawn":"DOWN","opponent_pawn":"UP","your_color":challenger.color,"opponent_color":player2.color,"your_nickname":challenger.nickname,"opponent_nickname":player2.nickname})
         player2.state = IN_GAME
         challenger.state = IN_GAME
         self.update_leaderboard()
