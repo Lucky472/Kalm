@@ -139,10 +139,12 @@ class View:
 
         self.color = color 
         self.oponent_color = oponent_color
+        
         self.my_walls = IntVar()
         self.my_walls.set(7)
         self.opponent_walls = IntVar()
         self.opponent_walls.set(7)
+
         # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6)
         self.pawns = {"DOWN":self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1,self.color),"UP":self.draw_pawn(X_AXIS_LENGTH // 2, 0,self.oponent_color)}
         #Pour gérer la couleur faudra savoir la couleur du bas et celle du haut
