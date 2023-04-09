@@ -139,6 +139,10 @@ class View:
 
         self.color = color 
         self.oponent_color = oponent_color
+        self.my_walls = IntVar()
+        self.my_walls.set(7)
+        self.opponent_walls = IntVar()
+        self.opponent_walls.set(7)
         # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6)
         self.pawns = {"DOWN":self.draw_pawn(X_AXIS_LENGTH // 2,Y_AXIS_LENGTH-1,self.color),"UP":self.draw_pawn(X_AXIS_LENGTH // 2, 0,self.oponent_color)}
         #Pour gérer la couleur faudra savoir la couleur du bas et celle du haut
@@ -173,18 +177,20 @@ class View:
         
     def name_labels(self):
         #FAUDRA CHANGER LA LISTE SELF.NAME
-        self.L_name_left = Label(self.f_labels, text = str(self.name[0]["name"]))
-        self.L_name_right = Label(self.f_labels, text = str(self.name[1]["name"]))
+        self.L_name_left = Label(self.f_labels, text = "jo")
+        self.L_name_right = Label(self.f_labels, text = "bama")
     
     def walls_left_labels(self):
-        self.L_wall_left = Label(self.f_labels, text = str(self.name[0]["walls"]))
-        self.L_wall_right = Label(self.f_labels, text = "WALLS LEFT" + "  " + str(self.name[1]["walls"]))
+        self.L_wall_left = Label(self.f_labels, textvariable = str(self.my_walls))
+        self.L_wall_middle = Label(self.f_labels, text = "WALLS LEFT" + " ")
+        self.L_wall_right = Label(self.f_labels, textvariable = str(self.my_walls))
     
     def pack_labels(self):
         self.f_labels.pack(side=TOP)
         self.L_name_left.pack(side=LEFT, padx=PIXEL_BOARD_X_LENGTH//4,expand=YES)
         self.L_name_right.pack(side=RIGHT, padx=PIXEL_BOARD_X_LENGTH//4, expand=YES)
         self.L_wall_left.pack(side=LEFT)
+        self.L_wall_middle.pack(side = LEFT)
         self.L_wall_right.pack(side=RIGHT)
         
     def pack_board(self):
@@ -225,6 +231,7 @@ class View:
                         print(x,y)
                         return (x,y)
     def detect_clicked_hole(self,evt):
+        self.my_walls.set(self.my_walls.get()-1)
         pixel_x =evt.x
         pixel_y = evt.y
         for x in range(1,X_AXIS_LENGTH):

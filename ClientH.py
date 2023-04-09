@@ -290,6 +290,8 @@ class Controller:
         self.state = INITIAL
         self.my_pawn = my_pawn
         self.opponent_pawn = opponent_pawn
+        self.my_nickname = my_nickname
+        self.opponent_nickname = opponent_nickname
         self.my_walls = IntVar()
         self.my_walls.set(INITWALL)
         self.opponent_walls = IntVar()
@@ -311,7 +313,7 @@ class Controller:
     
     def board_click(self,evt):
         if (self.state == ACTIVE):
-            if (self.move == PLACE_WALL_UP) and (self.my_walls != 0): 
+            if (self.move == PLACE_WALL_UP) and (self.my_walls > 0): 
                 hole = self.detect_clicked_hole(evt.x,evt.y)
                 if (hole != None):
                     if self.model.test_add_wall((hole[0],hole[1]),"UP"):
@@ -320,7 +322,7 @@ class Controller:
                         self.my_walls.set(self.my_walls.get()-1)
                     else:
                         boxedmessage.showinfo(title=None, message="TU PEUX PAS LE METTRE LA !")
-            if (self.move == PLACE_WALL_ACROSS)and (self.my_walls != 0): 
+            if (self.move == PLACE_WALL_ACROSS)and (self.my_walls > 0): 
                 print("clic side")
                 hole = self.detect_clicked_hole(evt.x,evt.y)
                 if (hole != None):
@@ -333,6 +335,7 @@ class Controller:
                 if square != None and square in self.model.accessible_from(self.model.pawns[self.my_pawn].coords):
                     self.controller_move_pawn(self.my_pawn, square)
                     self.send_moved_pawn(square)
+
 
     def controller_move_pawn(self,pawn, location):
         self.view.delete_deletable_dots()
@@ -421,8 +424,6 @@ class View:
         self.window = window
         self.canvas_board = Canvas(self.window,height = PIXEL_BOARD_Y_LENGTH + 2*Y_OFFSET,width =  PIXEL_BOARD_X_LENGTH + 2*X_OFFSET,bg =COLORBOARD )
         self.draw_board()
-        self.canvas_board.pack(side=TOP)        
-
         # La grille commence à (0,0) donc les coordonnées données vont jusqu'à (6,6) pour une taille de 7 cases
         if my_pawn == "UP":
             self.pawns = {opponent_pawn:self.draw_pawn(BOARD_X_LENGTH // 2,BOARD_Y_LENGTH-1 , opponent_color),my_pawn:self.draw_pawn(BOARD_X_LENGTH // 2, 0,color)}
@@ -436,12 +437,33 @@ class View:
         self.my_walls = self.controller.my_walls
         self.opponent_walls = self.controller.opponent_walls
         self.frame_buttons()
+        self.frame_labels()
         self.buttons()
         self.pack_buttons()
-        
+
+        self.name_labels()
+        self.walls_left_labels()
+
+
+        self.pack_labels()
+        self.canvas_board.pack(side=TOP)
+
+    def name_labels(self):
+        #FAUDRA CHANGER LA LISTE SELF.NAME
+        self.L_name_left = Label(self.f_labels, text = self.controller.my_nickname)
+        self.L_name_right = Label(self.f_labels, text = self.controller.opponent_nickname)
+    
+    def walls_left_labels(self):
+        self.L_wall_left = Label(self.f_labels, textvariable = str(self.my_walls))
+        self.L_wall_middle = Label(self.f_labels, text = "WALLS LEFT" + " ")
+        self.L_wall_right = Label(self.f_labels, textvariable = str(self.opponent_walls))
+
     def frame_buttons(self):
         self.f_buttons = Frame(self.window, width = WIDTHFRAME, height = HEIGHTFRAME)
-    
+
+    def frame_labels(self):
+        self.f_labels = Frame(self.window, width = WIDTHFRAME, height = HEIGHTFRAME)
+
     def buttons(self):
        self.B_move = Button(self.f_buttons, text = "Se déplacer", command = self.controller.set_move_pawn)
        self.B_horizontal_wall = Button(self.f_buttons, text = "Mur horizontal", command = self.controller.set_wall_horizontal)
@@ -452,6 +474,7 @@ class View:
         self.L_name_left.pack(side=LEFT, padx=PIXEL_BOARD_X_LENGTH//4,expand=YES)
         self.L_name_right.pack(side=RIGHT, padx=PIXEL_BOARD_X_LENGTH//4, expand=YES)
         self.L_wall_left.pack(side=LEFT)
+        self.L_wall_middle.pack(side = LEFT)
         self.L_wall_right.pack(side=RIGHT)
         
     def pack_buttons(self):
