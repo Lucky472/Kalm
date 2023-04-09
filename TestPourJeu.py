@@ -181,9 +181,9 @@ class View:
         self.L_name_right = Label(self.f_labels, text = "bama")
     
     def walls_left_labels(self):
-        self.L_wall_left = Label(self.f_labels, textvariable = str(self.my_walls))
+        self.L_wall_left = Label(self.f_labels, textvariable = self.my_walls)
         self.L_wall_middle = Label(self.f_labels, text = "WALLS LEFT" + " ")
-        self.L_wall_right = Label(self.f_labels, textvariable = str(self.my_walls))
+        self.L_wall_right = Label(self.f_labels, textvariable = self.my_walls)
     
     def pack_labels(self):
         self.f_labels.pack(side=TOP)

@@ -303,12 +303,6 @@ class Controller:
         self.state = INITIAL
         self.my_pawn = my_pawn
         self.opponent_pawn = opponent_pawn
-        self.my_nickname = my_nickname
-        self.opponent_nickname = opponent_nickname
-        self.my_walls = IntVar()
-        self.my_walls.set(INITWALL)
-        self.opponent_walls = IntVar()
-        self.opponent_walls.set(INITWALL)
 
         if self.my_pawn == "UP":
             self.set_active()
@@ -465,9 +459,9 @@ class View:
         self.L_name_right = Label(self.f_labels, text = self.controller.opponent_nickname)
     
     def walls_left_labels(self):
-        self.L_wall_left = Label(self.f_labels, textvariable = str(self.controller.my_walls))
+        self.L_wall_left = Label(self.f_labels, textvariable = self.controller.my_walls)
         self.L_wall_middle = Label(self.f_labels, text = "WALLS LEFT" + " ")
-        self.L_wall_right = Label(self.f_labels, textvariable = str(self.controller.opponent_walls))
+        self.L_wall_right = Label(self.f_labels, textvariable = self.controller.opponent_walls)
 
     def frame_buttons(self):
         self.f_buttons = Frame(self.window, width = WIDTHFRAME, height = HEIGHTFRAME)
