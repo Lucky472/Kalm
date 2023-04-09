@@ -139,8 +139,6 @@ class ClientWindow(Tk):
         self.client = Client(host, int(port), self,color,nickname)
         self.controller = None
         self.dico_list=[{"name":"matteo","score":2},{"name":"killian","score":13},{"name":"adrien","score":12},{"name":"lucas","score":4}]
-        self.text_tournament()
-        self.pack_tournament()
         self.afficher_liste_joueur(self.trier_liste(self.dico_list))
 
     def set_tournament(self):

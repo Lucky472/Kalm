@@ -129,7 +129,7 @@ class View:
     def __init__(self,window,color,oponent_color):
         self.window = window
         self.canvas_board = Canvas(self.window, height = PIXEL_BOARD_Y_LENGTH + 2*Y_OFFSET, width =  PIXEL_BOARD_X_LENGTH + 2*X_OFFSET,bg =COLORBOARD )
-        self.canvas_board.bind("<Button-1>",self.detect_clicked_square)
+        self.canvas_board.bind("<Button-1>",self.detect_clicked_hole)
         self.draw_board()
         self.controller = Controller
 
@@ -224,7 +224,21 @@ class View:
                         self.canvas_board.create_rectangle(x_minus,y_minus,x_maxus,y_maxus,fill = "#000000")
                         print(x,y)
                         return (x,y)
-        
+    def detect_clicked_hole(self,evt):
+        pixel_x =evt.x
+        pixel_y = evt.y
+        for x in range(1,X_AXIS_LENGTH):
+            x_minus = x*SIZESQUARE + X_OFFSET - LENGTH_LINE
+            x_maxus = (x)*SIZESQUARE + X_OFFSET + LENGTH_LINE
+            for y in range(1,Y_AXIS_LENGTH):
+                y_minus = y*SIZESQUARE + Y_OFFSET - LENGTH_LINE
+                y_maxus = (y)*SIZESQUARE + Y_OFFSET + LENGTH_LINE
+                if (pixel_x >= x_minus) and (pixel_x <= x_maxus):
+                    if (pixel_y >= y_minus) and (pixel_y <= y_maxus):
+                        self.place_vertical_wall(x,y)
+                        self.place_horizontal_wall(x,y)
+                        return (x,y)
+        return None
     def draw_pawn(self,x,y,color):
         x0,y0 = self.get_center(x,y)
         idd =  self.canvas_board.create_oval(x0 - RADIUSPAWN,y0-RADIUSPAWN,x0 + RADIUSPAWN,y0 + RADIUSPAWN,fill = color)
